@@ -1,5 +1,7 @@
 package com.baloise.open.maven.codeql;
 
+import com.baloise.open.maven.codeql.sarif.ConsoleParser;
+import com.baloise.open.maven.codeql.sarif.SarifParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -10,6 +12,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
@@ -33,13 +36,21 @@ public class SonarIssueReporter extends AbstractMojo {
     getLog().info("SonarIssueReporter works!");
 
     final File sarifFile = readSarifFile(sarifInputFile);
-
-    // TODO: validate Sarif file
+    validate(sarifFile);
 
     // TODO: parse result
+    try {
+      SarifParser.execute(sarifFile, new ConsoleParser(getLog()));
+    } catch (FileNotFoundException e) {
+      throw new MojoFailureException(e.getMessage());
+    }
 
     // TODO: write result
 
+  }
+
+  private void validate(File sarifFile) {
+    // TODO: add some validation
   }
 
   private File readSarifFile(String sarifInputFile) throws MojoExecutionException {

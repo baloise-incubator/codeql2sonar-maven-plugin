@@ -1,0 +1,23 @@
+package com.baloise.open.maven.codeql.sarif;
+
+import com.baloise.open.maven.codeql.sarif.dto.Result;
+import org.apache.maven.plugin.logging.Log;
+
+public class ConsoleParser implements ParserCallback {
+
+  private final Log logger;
+
+  public ConsoleParser(Log logger) {
+    this.logger = logger;
+  }
+
+  @Override
+  public void onFinding(Result result) {
+    logger.info(result.toString());
+  }
+
+  @Override
+  public void onVersion(String version) {
+    logger.info("Sarif version: " + version);
+  }
+}
