@@ -6,10 +6,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
-  <name>
-    Maven Plugin parsing SARIF files which were created by conducted CodeQL scan. The parsed result can be provided
-    to Sonarqube to display issues.
-  </name>
+  <name>Maven plugin parsing SARIF files created by CodeQL used for SonarQube issueReporter.</name>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -18,6 +15,16 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M5</version>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -25,13 +32,17 @@
       <version>3.6.3</version>
       <scope>provided</scope>
     </dependency>
-
-    <!-- dependencies to annotations -->
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
       <version>3.5.2</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.8.1</version> <!-- Need to stick to that version due to transitive usage by maven-plugin-api -->
+      <scope>compile</scope>
     </dependency>
 
     <!-- Test dependencies -->

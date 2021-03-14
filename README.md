@@ -19,4 +19,9 @@ add the following plugin to your pom.xml
 Run to execute ```mvnw codeql2sonar:SonarIssueReporter```
 
 ## How to configure
-TBD
+### Mandatory properties to define
+- __codeql2sonar.sarif.inputfile__: specifies the SARIF file created by CodeQL scan
+
+### Optional properties to define
+- __codeql2sonar.sarif.outputfile__: location where to write the parsed result
+  Default: target/sonar/codeql2sonar.json
