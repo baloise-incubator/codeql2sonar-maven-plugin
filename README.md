@@ -1,8 +1,10 @@
-#codeql2sonar-maven-plugin
+[![CI](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml)
+
+# codeql2sonar-maven-plugin
 It is a Maven Plugin parsing SARIF files which were created by conducted CodeQL scan. The parsed result is provided to
 Sonarqube via SonarIssueReporter thus issue are displayed on Sonar's project dashboard.
 
-##Prerequisit
+## Prerequisit
 In order to use this plugin properly, your JAVA project needs to be configured in Sonar already and connected using 
 ___org.sonarsource.scanner.maven:sonar-maven-plugin___
 
