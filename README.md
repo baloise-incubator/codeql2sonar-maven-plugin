@@ -1,4 +1,5 @@
 [![CI](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/codeql-analysis.yml)
 
 # codeql2sonar-maven-plugin
 It is a Maven Plugin parsing SARIF files which were created by conducted CodeQL scan. The parsed result is provided to
