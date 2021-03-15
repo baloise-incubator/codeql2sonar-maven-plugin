@@ -16,10 +16,11 @@ public class Result {
 
   @Override
   public String toString() {
-    String result = String.format("Process issue of rule '%s': '%s'", ruleId, message);
+    String result = String.format("Found issue based on rule '%s': '%s'", ruleId, message);
     if (locations != null && !locations.isEmpty()) {
-      result += "\n" + locations.get(0).toString();
+      result += "\nin '" + locations.get(0).toString() + "'";
     }
     return result;
   }
+
 }

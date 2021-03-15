@@ -8,6 +8,7 @@ import lombok.Data;
 public class Location {
 
   private String uri;
+  private String uriBaseId;
   private int index;
   private Region region;
 
