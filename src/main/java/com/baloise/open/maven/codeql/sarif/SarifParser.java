@@ -49,8 +49,8 @@ public class SarifParser {
   static final String ELEMENT_KIND = "kind";
   static final String ELEMENT_TAGS = "tags";
   static final String ELEMENT_PROBLEM_SEVERITY = "problem.severity";
-  public static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
-  public static final String ELEMENT_LEVEL = "level";
+  static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
+  static final String ELEMENT_LEVEL = "level";
 
   /**
    * Entry point to parse provided SarifFile. Expected file should be of schema
