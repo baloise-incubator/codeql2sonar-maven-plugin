@@ -16,10 +16,10 @@ public class Rule {
   @Override
   public String toString() {
     return String.format("Rule[%s]%s: '%s'; %s"
-            ,id
-            ,level!=null ? "-" + level : ""
-            ,name
-            ,properties);
+            , id
+            , level != null ? "-" + level : ""
+            , name
+            , properties);
   }
 
   public enum Level {

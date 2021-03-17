@@ -17,12 +17,6 @@ public class RuleProperties {
   private String precision;
   private Severity severity;
 
-  public enum Severity {
-    warning,
-    error,
-    recommendation
-  }
-
   @Override
   public String toString() {
     return "RuleProperties{" +
@@ -32,5 +26,11 @@ public class RuleProperties {
             ", precision='" + precision + '\'' +
             ", severity=" + severity +
             '}';
+  }
+
+  public enum Severity {
+    warning,
+    error,
+    recommendation
   }
 }

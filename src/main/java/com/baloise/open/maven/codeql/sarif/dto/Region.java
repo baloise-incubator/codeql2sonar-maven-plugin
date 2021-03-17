@@ -13,6 +13,9 @@ public class Region {
 
   @Override
   public String toString() {
-    return String.format("Line %d, Column %d", startLine, startColumn);
+    return String.format("Line %d, Column %d%s"
+            ,startLine
+            ,startColumn
+            , endColumn > 0 ? ":"+endColumn : "");
   }
 }

@@ -14,8 +14,8 @@ public class Location {
 
   @Override
   public String toString() {
-    return String.format("%s,%s"
-            , uri
+    return String.format("%s, %s"
+            , uri != null ? uri : "<URI_MISSING>"
             , region != null ? region.toString() : "n/a");
   }
 }
