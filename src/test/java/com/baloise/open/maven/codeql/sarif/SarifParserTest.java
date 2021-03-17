@@ -4,7 +4,6 @@ import com.baloise.open.maven.codeql.sarif.dto.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -105,7 +104,7 @@ class SarifParserTest {
 
   @Test
   void execute_wrongFile_FNFException() {
-    assertThrows(FileNotFoundException.class, () -> SarifParser.execute(new File(""), null));
+    assertThrows(FileNotFoundException.class, () -> SarifParser.execute(new File(""), (ParserCallback) null));
   }
 
 }

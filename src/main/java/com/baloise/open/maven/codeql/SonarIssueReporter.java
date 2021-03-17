@@ -2,6 +2,7 @@ package com.baloise.open.maven.codeql;
 
 import com.baloise.open.maven.codeql.sarif.ConsoleParser;
 import com.baloise.open.maven.codeql.sarif.SarifParser;
+import com.baloise.open.maven.sonar.SonarIssueMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -33,19 +34,19 @@ public class SonarIssueReporter extends AbstractMojo {
   public SonarIssueReporter() {  }
 
   public void execute() throws MojoExecutionException, MojoFailureException {
-    getLog().info("SonarIssueReporter works!");
+    getLog().info("execute SonarIssueReporter");
 
     final File sarifFile = readSarifFile(sarifInputFile);
     validate(sarifFile);
 
-    // TODO: parse result
     try {
-      SarifParser.execute(sarifFile, new ConsoleParser(getLog()));
+      final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
+      SarifParser.execute(sarifFile, new ConsoleParser(getLog()), sonarIssueMapper);
     } catch (FileNotFoundException e) {
       throw new MojoFailureException(e.getMessage());
     }
 
-    // TODO: write result
+    // TODO: write result using sonarIssueMapper
 
   }
 
