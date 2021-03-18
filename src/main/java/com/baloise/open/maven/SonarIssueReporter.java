@@ -1,4 +1,4 @@
-package com.baloise.open.maven.codeql;
+package com.baloise.open.maven;
 
 import com.baloise.open.maven.codeql.sarif.ConsoleParser;
 import com.baloise.open.maven.codeql.sarif.SarifParser;

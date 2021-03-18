@@ -1,5 +1,6 @@
 package com.baloise.open.maven.codeql;
 
+import com.baloise.open.maven.SonarIssueReporter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.jupiter.api.Test;
 

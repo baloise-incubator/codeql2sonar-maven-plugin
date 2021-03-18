@@ -98,4 +98,9 @@ public class SonarIssueMapper implements ParserCallback {
             .endColumn(region.getEndColumn())
             .build();
   }
+
+  public String getSummary() {
+    return String.format("parsed %d Rules, %d Results from codeQL resulting in %d issues.",
+            codeQlRules.size(), codeQlResults.size(), mappedIssues.size());
+  }
 }
