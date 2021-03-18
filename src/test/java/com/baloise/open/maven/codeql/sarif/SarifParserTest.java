@@ -23,6 +23,12 @@ class SarifParserTest {
   ArgumentCaptor<String> versionCaptor;
 
   @Captor
+  ArgumentCaptor<String> schemaCaptor;
+
+  @Captor
+  ArgumentCaptor<Driver> driverCaptor;
+
+  @Captor
   ArgumentCaptor<Rule> ruleCaptor;
 
   @Captor
@@ -37,6 +43,15 @@ class SarifParserTest {
 
     Mockito.verify(mockedParserCB, Mockito.times(1)).onVersion(versionCaptor.capture());
     assertEquals("2.1.0", versionCaptor.getValue());
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onSchema(schemaCaptor.capture());
+    assertEquals("https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", schemaCaptor.getValue());
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onDriver(driverCaptor.capture());
+    final Driver driverCaptured = driverCaptor.getValue();
+    assertEquals("GitHub", driverCaptured.getOrganization());
+    assertEquals("CodeQL", driverCaptured.getName());
+    assertEquals("2.3.3", driverCaptured.getSemanticVersion());
 
     Mockito.verify(mockedParserCB, Mockito.times(10)).onRule(ruleCaptor.capture());
     final List<Rule> rulesCaptured = ruleCaptor.getAllValues();

@@ -17,40 +17,42 @@ import java.util.logging.Logger;
 
 public class SarifParser {
 
+  public static final String ELEMENT_$SCHEMA = "$schema";
   static final Logger LOGGER = Logger.getLogger(SarifParser.class.getName());
-
-  static final String ELEMENT_PRECISION = "precision";
-  static final String ELEMENT_VERSION = "version";
-  static final String ELEMENT_RUNS = "runs";
-  static final String ELEMENT_RULES = "rules";
-  static final String ELEMENT_TOOL = "tool";
+  static final String ELEMENT_ARTIFACT_LOCATION = "artifactLocation";
+  static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
+  static final String ELEMENT_DESCRIPTION = "description";
   static final String ELEMENT_DRIVER = "driver";
-  static final String ELEMENT_RESULTS = "results";
+  static final String ELEMENT_END_COLUMN = "endColumn";
+  static final String ELEMENT_FULL_DESCRIPTION = "fullDescription";
   static final String ELEMENT_ID = "id";
+  static final String ELEMENT_INDEX = "index";
+  static final String ELEMENT_KIND = "kind";
+  static final String ELEMENT_LEVEL = "level";
+  static final String ELEMENT_LOCATIONS = "locations";
+  static final String ELEMENT_MESSAGE = "message";
   static final String ELEMENT_NAME = "name";
+  static final String ELEMENT_ORGANIZATION = "organization";
+  static final String ELEMENT_PHYSICAL_LOCATION = "physicalLocation";
+  static final String ELEMENT_PRECISION = "precision";
+  static final String ELEMENT_PROBLEM_SEVERITY = "problem.severity";
+  static final String ELEMENT_PROPERTIES = "properties";
+  static final String ELEMENT_REGION = "region";
+  static final String ELEMENT_RESULTS = "results";
+  static final String ELEMENT_RULES = "rules";
   static final String ELEMENT_RULE_ID = "ruleId";
   static final String ELEMENT_RULE_INDEX = "ruleIndex";
-  static final String ELEMENT_MESSAGE = "message";
+  static final String ELEMENT_RUNS = "runs";
+  static final String ELEMENT_SEMANTIC_VERSION = "semanticVersion";
   static final String ELEMENT_SHORT_DESCRIPTION = "shortDescription";
-  static final String ELEMENT_FULL_DESCRIPTION = "fullDescription";
-  static final String ELEMENT_LOCATIONS = "locations";
-  static final String ELEMENT_PHYSICAL_LOCATION = "physicalLocation";
-  static final String ELEMENT_ARTIFACT_LOCATION = "artifactLocation";
+  static final String ELEMENT_START_COLUMN = "startColumn";
+  static final String ELEMENT_START_LINE = "startLine";
+  static final String ELEMENT_TAGS = "tags";
+  static final String ELEMENT_TEXT = "text";
+  static final String ELEMENT_TOOL = "tool";
   static final String ELEMENT_URI = "uri";
   static final String ELEMENT_URI_BASE_ID = "uriBaseId";
-  static final String ELEMENT_INDEX = "index";
-  static final String ELEMENT_REGION = "region";
-  static final String ELEMENT_START_LINE = "startLine";
-  static final String ELEMENT_START_COLUMN = "startColumn";
-  static final String ELEMENT_END_COLUMN = "endColumn";
-  static final String ELEMENT_TEXT = "text";
-  static final String ELEMENT_PROPERTIES = "properties";
-  static final String ELEMENT_DESCRIPTION = "description";
-  static final String ELEMENT_KIND = "kind";
-  static final String ELEMENT_TAGS = "tags";
-  static final String ELEMENT_PROBLEM_SEVERITY = "problem.severity";
-  static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
-  static final String ELEMENT_LEVEL = "level";
+  static final String ELEMENT_VERSION = "version";
 
   /**
    * Entry point to parse provided SarifFile. Expected file should be of schema
@@ -67,6 +69,11 @@ public class SarifParser {
     if (rootObject.has(ELEMENT_VERSION)) {
       final String version = rootObject.get(SarifParser.ELEMENT_VERSION).getAsString();
       Arrays.stream(callback).forEach(cb -> cb.onVersion(version));
+    }
+
+    if (rootObject.has(ELEMENT_$SCHEMA)) {
+      final String schema = rootObject.get(SarifParser.ELEMENT_$SCHEMA).getAsString();
+      Arrays.stream(callback).forEach(cb -> cb.onSchema(schema));
     }
 
     if (rootObject.has(ELEMENT_RUNS)) {
@@ -87,6 +94,8 @@ public class SarifParser {
 
       if (toolObject.has(ELEMENT_DRIVER)) {
         final JsonObject driver = toolObject.get(ELEMENT_DRIVER).getAsJsonObject();
+        final Driver driverDto = parseDriver(driver);
+        Arrays.stream(callback).forEach(cb -> cb.onDriver(driverDto));
 
         if (driver.has(ELEMENT_RULES)) {
           driver.get(ELEMENT_RULES).getAsJsonArray().forEach(rule -> {
@@ -104,6 +113,17 @@ public class SarifParser {
         }
       }
     }
+  }
+
+  private static Driver parseDriver(JsonObject driver) {
+    if (driver == null) {
+      return null;
+    }
+    return Driver.builder()
+            .name(driver.get(ELEMENT_NAME).getAsString())
+            .organization(driver.get(ELEMENT_ORGANIZATION).getAsString())
+            .semanticVersion(driver.get(ELEMENT_SEMANTIC_VERSION).getAsString())
+            .build();
   }
 
   private static Rule.Level parseDefaultConfigLevel(JsonObject jsonObjectRule) {
@@ -185,8 +205,8 @@ public class SarifParser {
       final JsonArray locations = resultJsonObject.get(ELEMENT_LOCATIONS).getAsJsonArray();
       // Also render relatedLocations if required...
 
-      locations.forEach(l -> {
-        final JsonObject locationJsonObject = l.getAsJsonObject();
+      locations.forEach(loc -> {
+        final JsonObject locationJsonObject = loc.getAsJsonObject();
         if (locationJsonObject.has(ELEMENT_PHYSICAL_LOCATION)) {
           final JsonObject physicalLocation = locationJsonObject.get(ELEMENT_PHYSICAL_LOCATION).getAsJsonObject();
           final JsonObject artifactLocation = physicalLocation.get(ELEMENT_ARTIFACT_LOCATION).getAsJsonObject();

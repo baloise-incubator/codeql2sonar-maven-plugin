@@ -1,6 +1,7 @@
 package com.baloise.open.maven.sonar;
 
 import com.baloise.open.maven.codeql.sarif.ParserCallback;
+import com.baloise.open.maven.codeql.sarif.dto.Driver;
 import com.baloise.open.maven.codeql.sarif.dto.Region;
 import com.baloise.open.maven.codeql.sarif.dto.Result;
 import com.baloise.open.maven.codeql.sarif.dto.Rule;
@@ -18,12 +19,13 @@ public class SonarIssueMapper implements ParserCallback {
 
   private final ArrayList<Result> codeQlResults = new ArrayList<>();
   private final ArrayList<Rule> codeQlRules = new ArrayList<>();
-
-  @Getter
-  private String version;
-
   @Getter
   private final List<Issue> mappedIssues = new ArrayList<>();
+  private Driver driver;
+  @Getter
+  private String version;
+  @Getter
+  private String schema;
 
   @Override
   public void onFinding(Result result) {
@@ -37,6 +39,16 @@ public class SonarIssueMapper implements ParserCallback {
   }
 
   @Override
+  public void onSchema(String schema) {
+    this.schema = schema;
+  }
+
+  @Override
+  public void onDriver(Driver driver) {
+    this.driver = driver;
+  }
+
+  @Override
   public void onRule(Rule rule) {
     codeQlRules.add(rule);
   }
@@ -46,8 +58,7 @@ public class SonarIssueMapper implements ParserCallback {
             .ruleId(result.getRuleId())
             .primarylocation(mapPrimaryLocation(result))
             .secondaryLocations(mapSecondaryLocations(result))
-            // .engineID()
-            // TODO: add driver do access here and map accordingly -> put version also into this??
+            .engineID(driver != null ? driver.toString() : SonarIssueMapper.class.getSimpleName())
             .build();
   }
 
