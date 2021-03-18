@@ -19,7 +19,7 @@ add the following plugin to your pom.xml
 </plugin>
 ```
 
-Run to execute ```mvnw codeql2sonar:SonarIssueReporter```
+Run to execute ```mvn codeql2sonar:SonarIssueReporter```
 
 ## How to configure
 ### Mandatory properties
