@@ -17,8 +17,9 @@ import java.util.logging.Logger;
 
 public class SarifParser {
 
-  public static final String ELEMENT_$SCHEMA = "$schema";
   static final Logger LOGGER = Logger.getLogger(SarifParser.class.getName());
+
+  static final String ELEMENT_$SCHEMA = "$schema";
   static final String ELEMENT_ARTIFACT_LOCATION = "artifactLocation";
   static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
   static final String ELEMENT_DESCRIPTION = "description";

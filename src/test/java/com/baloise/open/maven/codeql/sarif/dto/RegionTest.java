@@ -1,6 +1,6 @@
 package com.baloise.open.maven.codeql.sarif.dto;
 
-import com.baloise.open.maven.codeql.PropertyReflectionTest;
+import com.baloise.open.maven.PropertyReflectionTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

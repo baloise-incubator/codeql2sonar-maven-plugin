@@ -3,6 +3,7 @@ package com.baloise.open.maven;
 import com.baloise.open.maven.codeql.sarif.ConsoleParser;
 import com.baloise.open.maven.codeql.sarif.SarifParser;
 import com.baloise.open.maven.sonar.SonarIssueMapper;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
@@ -29,8 +30,9 @@ public class SonarIssueReporter extends AbstractMojo {
   @Parameter(property = "codeql2sonar.sarif.outputfile", defaultValue = "target/sonar/codeql2sonar.json")
   private String target;
 
-  public SonarIssueReporter(String sarifInputFile) {
+  public SonarIssueReporter(String sarifInputFile, String target) {
     this.sarifInputFile = sarifInputFile;
+    this.target = target;
   }
 
   @Inject
@@ -39,16 +41,17 @@ public class SonarIssueReporter extends AbstractMojo {
 
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().info("execute SonarIssueReporter");
+    final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
     try {
-      final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
+      // read and parse input
       SarifParser.execute(readSarifFile(sarifInputFile)
               , new ConsoleParser(getLog()), sonarIssueMapper);
-    } catch (FileNotFoundException e) {
-      throw new MojoFailureException(e.getMessage());
+
+      // write result to target
+      new Gson().toJson(sonarIssueMapper.getMappedIssues(), new FileWriter(target));
+    } catch (Exception e) {
+      throw new MojoExecutionException(e.getMessage());
     }
-
-    // TODO: write result using sonarIssueMapper
-
   }
 
   private File readSarifFile(String sarifInputFile) throws MojoExecutionException {

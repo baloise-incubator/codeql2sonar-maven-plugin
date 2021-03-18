@@ -26,5 +26,6 @@ Run to execute ```mvn codeql2sonar:SonarIssueReporter```
 - __codeql2sonar.sarif.inputfile__: specifies the SARIF file created by CodeQL scan
 
 ### Optional properties
-- __codeql2sonar.sarif.outputfile__: location where to write the parsed result
-  Default: target/sonar/codeql2sonar.json
+- __codeql2sonar.sarif.outputfile__: location where to write the parsed result.
+  
+  _Default: target/sonar/codeql2sonar.json_

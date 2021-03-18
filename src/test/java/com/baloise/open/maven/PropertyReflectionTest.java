@@ -1,4 +1,4 @@
-package com.baloise.open.maven.codeql;
+package com.baloise.open.maven;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

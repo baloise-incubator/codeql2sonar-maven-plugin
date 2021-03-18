@@ -10,7 +10,9 @@ class SonarIssueReporterTest {
 
   @Test
   void execute_FileMissing_ExceptionExpected() {
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ").execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ").execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ").execute());
   }
 }

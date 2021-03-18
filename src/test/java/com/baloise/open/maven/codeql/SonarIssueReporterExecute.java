@@ -6,9 +6,11 @@ import com.baloise.open.maven.codeql.sarif.dto.Driver;
 import com.baloise.open.maven.codeql.sarif.dto.Result;
 import com.baloise.open.maven.codeql.sarif.dto.Rule;
 import com.baloise.open.maven.sonar.SonarIssueMapper;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -24,6 +26,9 @@ public class SonarIssueReporterExecute {
 
     SarifParser.execute(sarifInputFile, logParser, sonarIssueMapper);
     LOGGER.info(sonarIssueMapper.getSummary());
+    final StringWriter stringWriter = new StringWriter();
+    new Gson().toJson(sonarIssueMapper.getMappedIssues(), stringWriter);
+    LOGGER.info(stringWriter.toString());
   }
 
   private static ParserCallback logParser = new ParserCallback() {
