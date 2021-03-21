@@ -7,7 +7,7 @@ class IssueTest extends PropertyReflectionTest {
 
   @Test
   void verifyProperties() {
-    assertNumberOfProperties(Issue.class, 5);
+    assertNumberOfProperties(Issue.class, 7);
   }
 
 }

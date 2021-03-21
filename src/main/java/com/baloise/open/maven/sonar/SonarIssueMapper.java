@@ -1,11 +1,9 @@
 package com.baloise.open.maven.sonar;
 
 import com.baloise.open.maven.codeql.sarif.ParserCallback;
-import com.baloise.open.maven.codeql.sarif.dto.Driver;
-import com.baloise.open.maven.codeql.sarif.dto.Region;
-import com.baloise.open.maven.codeql.sarif.dto.Result;
-import com.baloise.open.maven.codeql.sarif.dto.Rule;
+import com.baloise.open.maven.codeql.sarif.dto.*;
 import com.baloise.open.maven.sonar.dto.Issue;
+import com.baloise.open.maven.sonar.dto.Issues;
 import com.baloise.open.maven.sonar.dto.Location;
 import com.baloise.open.maven.sonar.dto.TextRange;
 import lombok.Getter;
@@ -20,7 +18,7 @@ public class SonarIssueMapper implements ParserCallback {
   private final ArrayList<Result> codeQlResults = new ArrayList<>();
   private final ArrayList<Rule> codeQlRules = new ArrayList<>();
   @Getter
-  private final List<Issue> mappedIssues = new ArrayList<>();
+  private final Issues mappedIssues = new Issues();
   private Driver driver;
   @Getter
   private String version;
@@ -54,12 +52,84 @@ public class SonarIssueMapper implements ParserCallback {
   }
 
   private Issue mapResult(Result result) {
+    final Issue.Severity severity = mapSeverity(result.getRuleId());
     return Issue.builder()
             .ruleId(result.getRuleId())
-            .primarylocation(mapPrimaryLocation(result))
+            .primaryLocation(mapPrimaryLocation(result))
             .secondaryLocations(mapSecondaryLocations(result))
-            .engineID(driver != null ? driver.toString() : SonarIssueMapper.class.getSimpleName())
+            .severity(severity)
+            .type(mapType(severity))
+            .engineId(driver != null ? driver.toString() : SonarIssueMapper.class.getSimpleName())
             .build();
+  }
+
+  private Issue.Severity mapSeverity(String ruleId) {
+    final Rule matchingRule = codeQlRules.stream().filter(rule -> rule.getId().equals(ruleId)).findFirst().orElse(null);
+    if (matchingRule != null && matchingRule.getProperties().getSeverity() != null) {
+      return mapRuleToIssueSeverity(matchingRule.getLevel(), matchingRule.getProperties());
+    }
+    return Issue.Severity.INFO;
+  }
+
+  // TODO: verify if mapping is as expected
+  private Issue.Severity mapRuleToIssueSeverity(Rule.Level level, RuleProperties properties) {
+    switch (properties.getSeverity()) {
+      case recommendation:
+        return Issue.Severity.INFO;
+      case warning:
+        // consider precision as first criteria
+        switch (properties.getPrecision().toLowerCase()) {
+          case "medium":
+            return Issue.Severity.MINOR;
+          case "high":
+            return Issue.Severity.MAJOR;
+          case "very-high":
+            return Issue.Severity.CRITICAL;
+        }
+        // if not set or unknown consider level as second criteria
+        if (level == null) {
+          return Issue.Severity.MINOR;
+        }
+        switch (level) {
+          case none:
+          case note:
+            return Issue.Severity.MINOR;
+          case warning:
+            return Issue.Severity.MAJOR;
+          case error:
+            return Issue.Severity.CRITICAL;
+        }
+      case error:
+        // consider precision as first criteria
+        switch (properties.getPrecision().toLowerCase()) {
+          case "medium":
+          case "high":
+            return Issue.Severity.CRITICAL;
+          case "very-high":
+            return Issue.Severity.BLOCKER;
+        }
+        // if not set or unknown consider level as second criteria
+        if (level == Rule.Level.error) {
+          return Issue.Severity.BLOCKER;
+        }
+        return Issue.Severity.CRITICAL;
+    }
+    return null;
+  }
+
+  // TODO: verify if mapping is as expected
+  private Issue.Type mapType(Issue.Severity severity) {
+    switch (severity) {
+      case INFO:
+      case MINOR:
+      case MAJOR:
+        return Issue.Type.CODE_SMELL;
+      case BLOCKER:
+        return Issue.Type.BUG;
+      case CRITICAL:
+      default:
+        return Issue.Type.VULNERABILITY;
+    }
   }
 
   private Set<Location> mapSecondaryLocations(Result result) {
@@ -90,7 +160,7 @@ public class SonarIssueMapper implements ParserCallback {
     if (region == null) {
       return null;
     }
-    // TODO: Obviously the offset needs to be recalculated
+    // TODO: verify if offset needs to be recalculated
     return TextRange.builder()
             .startLine(region.getStartLine())
             .endLine(region.getStartLine())

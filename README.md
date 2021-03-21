@@ -27,5 +27,4 @@ Run to execute ```mvn codeql2sonar:SonarIssueReporter```
 
 ### Optional properties
 - __codeql2sonar.sarif.outputfile__: location where to write the parsed result.
-  
   _Default: target/sonar/codeql2sonar.json_

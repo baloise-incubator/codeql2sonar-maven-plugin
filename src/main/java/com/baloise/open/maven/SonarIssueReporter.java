@@ -3,13 +3,12 @@ package com.baloise.open.maven;
 import com.baloise.open.maven.codeql.sarif.ConsoleParser;
 import com.baloise.open.maven.codeql.sarif.SarifParser;
 import com.baloise.open.maven.sonar.SonarIssueMapper;
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -39,7 +38,7 @@ public class SonarIssueReporter extends AbstractMojo {
   public SonarIssueReporter() {
   }
 
-  public void execute() throws MojoExecutionException, MojoFailureException {
+  public void execute() throws MojoExecutionException {
     getLog().info("execute SonarIssueReporter");
     final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
     try {
@@ -48,7 +47,11 @@ public class SonarIssueReporter extends AbstractMojo {
               , new ConsoleParser(getLog()), sonarIssueMapper);
 
       // write result to target
-      new Gson().toJson(sonarIssueMapper.getMappedIssues(), new FileWriter(target));
+      try (final FileWriter writer = new FileWriter(target)) {
+        getLog().info("writing target " + target);
+        new GsonBuilder().setPrettyPrinting().create().toJson(sonarIssueMapper.getMappedIssues(), writer);
+        writer.flush();
+      }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage());
     }
