@@ -14,11 +14,4 @@ public class Issues {
 
   private final List<Issue> issues = new ArrayList<>();
 
-  public void add(Issue issue) {
-    issues.add(issue);
-  }
-
-  public int size() {
-    return issues.size();
-  }
 }

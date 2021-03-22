@@ -18,6 +18,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+// TODO: add filter to exclude TESTS
+// TODO: add options to configure level to log output
+// TODO: add missing tests
+
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
 

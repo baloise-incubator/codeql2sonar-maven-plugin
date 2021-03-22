@@ -17,7 +17,6 @@ public class SonarIssueMapper implements ParserCallback {
 
   private final ArrayList<Result> codeQlResults = new ArrayList<>();
   private final ArrayList<Rule> codeQlRules = new ArrayList<>();
-  @Getter
   private final Issues mappedIssues = new Issues();
   private Driver driver;
   @Getter
@@ -28,7 +27,7 @@ public class SonarIssueMapper implements ParserCallback {
   @Override
   public void onFinding(Result result) {
     codeQlResults.add(result);
-    mappedIssues.add(mapResult(result));
+    mappedIssues.getIssues().add(mapResult(result));
   }
 
   @Override
@@ -63,7 +62,7 @@ public class SonarIssueMapper implements ParserCallback {
             .build();
   }
 
-  private Issue.Severity mapSeverity(String ruleId) {
+  Issue.Severity mapSeverity(String ruleId) {
     final Rule matchingRule = codeQlRules.stream().filter(rule -> rule.getId().equals(ruleId)).findFirst().orElse(null);
     if (matchingRule != null && matchingRule.getProperties().getSeverity() != null) {
       return mapRuleToIssueSeverity(matchingRule.getLevel(), matchingRule.getProperties());
@@ -72,7 +71,11 @@ public class SonarIssueMapper implements ParserCallback {
   }
 
   // TODO: verify if mapping is as expected
-  private Issue.Severity mapRuleToIssueSeverity(Rule.Level level, RuleProperties properties) {
+  Issue.Severity mapRuleToIssueSeverity(Rule.Level level, RuleProperties properties) {
+    if (properties == null || properties.getSeverity() == null) {
+      return (level == null) ? null : mapRuleLevelToSeverity(level);
+    }
+
     switch (properties.getSeverity()) {
       case recommendation:
         return Issue.Severity.INFO;
@@ -87,26 +90,17 @@ public class SonarIssueMapper implements ParserCallback {
             return Issue.Severity.CRITICAL;
         }
         // if not set or unknown consider level as second criteria
-        if (level == null) {
-          return Issue.Severity.MINOR;
-        }
-        switch (level) {
-          case none:
-          case note:
-            return Issue.Severity.MINOR;
-          case warning:
-            return Issue.Severity.MAJOR;
-          case error:
-            return Issue.Severity.CRITICAL;
-        }
+        return (level == null) ? Issue.Severity.MINOR : mapRuleLevelToSeverity(level);
       case error:
         // consider precision as first criteria
-        switch (properties.getPrecision().toLowerCase()) {
-          case "medium":
-          case "high":
-            return Issue.Severity.CRITICAL;
-          case "very-high":
-            return Issue.Severity.BLOCKER;
+        if (properties.getPrecision() != null) {
+          switch (properties.getPrecision().toLowerCase()) {
+            case "medium":
+            case "high":
+              return Issue.Severity.CRITICAL;
+            case "very-high":
+              return Issue.Severity.BLOCKER;
+          }
         }
         // if not set or unknown consider level as second criteria
         if (level == Rule.Level.error) {
@@ -114,11 +108,25 @@ public class SonarIssueMapper implements ParserCallback {
         }
         return Issue.Severity.CRITICAL;
     }
+
+    return null;
+  }
+
+  private Issue.Severity mapRuleLevelToSeverity(Rule.Level level) {
+    switch (level) {
+      case none:
+      case note:
+        return Issue.Severity.MINOR;
+      case warning:
+        return Issue.Severity.MAJOR;
+      case error:
+        return Issue.Severity.CRITICAL;
+    }
     return null;
   }
 
   // TODO: verify if mapping is as expected
-  private Issue.Type mapType(Issue.Severity severity) {
+  Issue.Type mapType(Issue.Severity severity) {
     switch (severity) {
       case INFO:
       case MINOR:
@@ -132,7 +140,7 @@ public class SonarIssueMapper implements ParserCallback {
     }
   }
 
-  private Set<Location> mapSecondaryLocations(Result result) {
+  Set<Location> mapSecondaryLocations(Result result) {
     final List<com.baloise.open.maven.codeql.sarif.dto.Location> locations = result.getLocations();
     if (locations == null || locations.size() < 2) {
       return null;
@@ -140,7 +148,7 @@ public class SonarIssueMapper implements ParserCallback {
     return locations.stream().skip(1).map(location -> mapLocation(location, result.getMessage())).collect(Collectors.toSet());
   }
 
-  private Location mapPrimaryLocation(Result result) {
+  Location mapPrimaryLocation(Result result) {
     final List<com.baloise.open.maven.codeql.sarif.dto.Location> locations = result.getLocations();
     if (locations == null || locations.isEmpty()) {
       return null;
@@ -171,6 +179,10 @@ public class SonarIssueMapper implements ParserCallback {
 
   public String getSummary() {
     return String.format("parsed %d Rules, %d Results from codeQL resulting in %d issues.",
-            codeQlRules.size(), codeQlResults.size(), mappedIssues.size());
+            codeQlRules.size(), codeQlResults.size(), mappedIssues.getIssues().size());
+  }
+
+  public List<Issue> getMappedIssues() {
+    return mappedIssues.getIssues();
   }
 }
