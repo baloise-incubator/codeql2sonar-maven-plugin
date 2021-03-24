@@ -2,15 +2,19 @@ package com.baloise.open.maven.sonar;
 
 import com.baloise.open.maven.codeql.sarif.dto.*;
 import com.baloise.open.maven.sonar.dto.Issue;
+import com.baloise.open.maven.sonar.dto.TextRange;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SonarIssueMapperTest {
 
   public static final String TEST_RULE_ID = "testRuleId";
+  public static final String TEST_URI_BASE_ID = "testUriBaseId";
 
   @Test
   void testParserCallback_onFinding() {
@@ -85,7 +89,38 @@ class SonarIssueMapperTest {
 
   @Test
   void testMapRuleToIssueSeverity() {
+    final SonarIssueMapper testee = new SonarIssueMapper();
 
+    assertEquals(Issue.Severity.INFO, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.recommendation).build()));
+
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(null
+            , RuleProperties.builder().severity(RuleProperties.Severity.warning).build()));
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("medium").build()));
+    assertEquals(Issue.Severity.MAJOR, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("high").build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("very-high").build()));
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(null
+            , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("<invalid>").build()));
+
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(null
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
+    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.error
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("medium").build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("high").build()));
+    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("very-high").build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+            , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("<invalid>").build()));
+
+    assertNull(testee.mapRuleToIssueSeverity(null, RuleProperties.builder().build()));
   }
 
   @Test
@@ -99,11 +134,54 @@ class SonarIssueMapperTest {
   }
 
   @Test
-  void testMapSecondaryLocations() {
+  void testMapPrimaryLocation() {
+    final SonarIssueMapper testee = new SonarIssueMapper();
+    final Location primLoc = createTestLocation("uriPrimLoc", 80, 5, 6, 27);
+    final Location secondLoc = createTestLocation("uriSecondLoc", 81, 7, 20, 14);
+
+    final com.baloise.open.maven.sonar.dto.Location result = testee.mapPrimaryLocation(Result.builder()
+            .locations(Arrays.asList(primLoc, secondLoc))
+            .message("Test primary Location")
+            .build());
+
+    assertNotNull(result);
+    assertEquals("uriPrimLoc", result.getFilePath());
+    assertEquals("Test primary Location", result.getMessage());
+    final TextRange textRange = result.getTextRange();
+    assertNotNull(textRange);
+    assertEquals(27, textRange.getStartLine());
+    assertEquals(5, textRange.getStartColumn());
+    assertEquals(6, textRange.getEndColumn());
   }
 
   @Test
-  void testMapPrimaryLocation() {
+  void testMapSecondaryLocations() {
+    final SonarIssueMapper testee = new SonarIssueMapper();
+    final Location primLoc = createTestLocation("uriPrimLoc", 80, 5, 6, 27);
+    final Location secondLoc = createTestLocation("uriSecondLoc", 81, 7, 20, 14);
+    final Location duplicate = createTestLocation("uriSecondLoc", 81, 7, 20, 14);
+    final Location secondLoc2 = createTestLocation("thirdLocation", 90, 3, 9, 8);
+
+    final Result input = Result.builder()
+            .locations(Arrays.asList(primLoc, secondLoc, duplicate, secondLoc2))
+            .message("Test secondary Locations")
+            .build();
+    final Set<com.baloise.open.maven.sonar.dto.Location> results = testee.mapSecondaryLocations(input);
+
+    assertNotNull(results);
+    assertEquals(4, input.getLocations().size());
+    assertEquals(2, results.size(), "Assumed primary location and duplicate are not included");
+    assertEquals(0, results.stream().filter(loc -> loc.getFilePath().equals("uriPrimLoc")).count());
+    assertEquals(1, results.stream().filter(loc -> loc.getFilePath().equals("uriSecondLoc")).count());
+    final com.baloise.open.maven.sonar.dto.Location thirdLocation = results.stream()
+            .filter(loc -> loc.getFilePath().equals("thirdLocation")).findFirst().orElse(null);
+    assertNotNull(thirdLocation);
+    assertEquals("Test secondary Locations", thirdLocation.getMessage());
+    final TextRange textRange = thirdLocation.getTextRange();
+    assertNotNull(textRange);
+    assertEquals(8, textRange.getStartLine());
+    assertEquals(3, textRange.getStartColumn());
+    assertEquals(9, textRange.getEndColumn());
   }
 
   private Rule createTestRule() {
@@ -123,17 +201,16 @@ class SonarIssueMapperTest {
             .message("TestMessage")
             .ruleId(TEST_RULE_ID)
             .ruleIndex(4)
-
-            .locations(Collections.singletonList(createTestLocation()))
+            .locations(Collections.singletonList(createTestLocation("testUri", 4, 1, 2, 3)))
             .build();
   }
 
-  private Location createTestLocation() {
+  private Location createTestLocation(String uri, int index, int startColumn, int endColumn, int startLine) {
     return Location.builder()
-            .uri("testUri")
-            .uriBaseId("testUriBaseId")
-            .index(4)
-            .region(Region.builder().startColumn(1).endColumn(2).startLine(3).startLine(4).build())
+            .uri(uri)
+            .uriBaseId(TEST_URI_BASE_ID)
+            .index(index)
+            .region(Region.builder().startColumn(startColumn).endColumn(endColumn).startLine(startLine).build())
             .build();
   }
 }

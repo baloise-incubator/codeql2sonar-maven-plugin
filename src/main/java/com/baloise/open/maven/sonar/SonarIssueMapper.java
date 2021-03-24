@@ -71,30 +71,37 @@ public class SonarIssueMapper implements ParserCallback {
   }
 
   // TODO: verify if mapping is as expected
-  Issue.Severity mapRuleToIssueSeverity(Rule.Level level, RuleProperties properties) {
+  Issue.Severity mapRuleToIssueSeverity(final Rule.Level level, final RuleProperties properties) {
     if (properties == null || properties.getSeverity() == null) {
+      // without properties the only basis to map severity is the rule level.
       return (level == null) ? null : mapRuleLevelToSeverity(level);
     }
 
-    switch (properties.getSeverity()) {
+    final RuleProperties.Severity ruleSeverity = properties.getSeverity();
+    final String rulePrecision = properties.getPrecision();
+
+    switch (ruleSeverity) {
       case recommendation:
         return Issue.Severity.INFO;
       case warning:
         // consider precision as first criteria
-        switch (properties.getPrecision().toLowerCase()) {
-          case "medium":
-            return Issue.Severity.MINOR;
-          case "high":
-            return Issue.Severity.MAJOR;
-          case "very-high":
-            return Issue.Severity.CRITICAL;
+        if (rulePrecision != null) {
+          switch (rulePrecision.toLowerCase()) {
+            case "medium":
+              return Issue.Severity.MINOR;
+            case "high":
+              return Issue.Severity.MAJOR;
+            case "very-high":
+              return Issue.Severity.CRITICAL;
+          }
         }
         // if not set or unknown consider level as second criteria
         return (level == null) ? Issue.Severity.MINOR : mapRuleLevelToSeverity(level);
+
       case error:
         // consider precision as first criteria
-        if (properties.getPrecision() != null) {
-          switch (properties.getPrecision().toLowerCase()) {
+        if (rulePrecision != null) {
+          switch (rulePrecision.toLowerCase()) {
             case "medium":
             case "high":
               return Issue.Severity.CRITICAL;
