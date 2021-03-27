@@ -6,6 +6,7 @@ import com.baloise.open.maven.sonar.SonarIssueMapper;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,13 +15,10 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 
 // TODO: add filter to exclude TESTS
 // TODO: add options to configure level to log output
-// TODO: add missing tests
 
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
@@ -33,6 +31,9 @@ public class SonarIssueReporter extends AbstractMojo {
   @Parameter(property = "codeql2sonar.sarif.outputfile", defaultValue = "target/sonar/codeql2sonar.json")
   private String target;
 
+  @Setter
+  private Writer writer;
+
   public SonarIssueReporter(String sarifInputFile, String target) {
     this.sarifInputFile = sarifInputFile;
     this.target = target;
@@ -44,21 +45,27 @@ public class SonarIssueReporter extends AbstractMojo {
 
   public void execute() throws MojoExecutionException {
     getLog().info("execute SonarIssueReporter");
-    final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
     try {
-      // read and parse input
-      SarifParser.execute(readSarifFile(sarifInputFile)
-              , new ConsoleParser(getLog()), sonarIssueMapper);
-
-      // write result to target
-      try (final FileWriter writer = new FileWriter(target)) {
-        getLog().info("writing target " + target);
-        new GsonBuilder().setPrettyPrinting().create().toJson(sonarIssueMapper.getMappedIssues(), writer);
-        writer.flush();
+      final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
+      final File inputFile = readSarifFile(this.sarifInputFile);
+      SarifParser.execute(inputFile, new ConsoleParser(getLog()), sonarIssueMapper);
+      try (final Writer writer = getWriter()) {
+        writeResult(sonarIssueMapper, writer);
       }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage());
     }
+  }
+
+  private Writer getWriter() throws IOException {
+    return (writer == null) ? new FileWriter(target) : writer;
+  }
+
+  private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
+    getLog().info("writing target " + target);
+    new GsonBuilder().setPrettyPrinting().create()
+            .toJson(sonarIssueMapper.getMappedIssues(), writer);
+    writer.flush();
   }
 
   private File readSarifFile(String sarifInputFile) throws MojoExecutionException {
