@@ -17,26 +17,38 @@ import org.apache.maven.plugins.annotations.Parameter;
 import javax.inject.Inject;
 import java.io.*;
 
-// TODO: add filter to exclude TESTS
 // TODO: add options to configure level to log output
 
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
 
   private static final String ERR_FILE_SUFFIX = "Verify parameter codeql2sonar.sarif.inputfile in your pom.xml";
+  private static final String DEFAULT_OURPUT_FILE = "target/sonar/codeql2sonar.json";
+  private static final String DEFAULT_IGNORE_TEST_FLAG = "false";
 
   @Parameter(property = "codeql2sonar.sarif.inputfile")
   private String sarifInputFile;
 
-  @Parameter(property = "codeql2sonar.sarif.outputfile", defaultValue = "target/sonar/codeql2sonar.json")
+  @Parameter(property = "codeql2sonar.sarif.outputfile", defaultValue = DEFAULT_OURPUT_FILE)
   private String target;
+
+  @Parameter(property = "codeql2sonar.sarif.ignoreTests", defaultValue = DEFAULT_IGNORE_TEST_FLAG)
+  private boolean ignoreTests;
 
   @Setter
   private Writer writer;
 
-  public SonarIssueReporter(String sarifInputFile, String target) {
+  public SonarIssueReporter(String sarifInputFile) {
+    this.sarifInputFile = sarifInputFile;
+    /* set defaults */
+    this.target = DEFAULT_OURPUT_FILE;
+    this.ignoreTests = false;
+  }
+
+  public SonarIssueReporter(String sarifInputFile, String target, boolean ignoreTests) {
     this.sarifInputFile = sarifInputFile;
     this.target = target;
+    this.ignoreTests = ignoreTests;
   }
 
   @Inject
@@ -64,7 +76,7 @@ public class SonarIssueReporter extends AbstractMojo {
   private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
     getLog().info("writing target " + target);
     new GsonBuilder().setPrettyPrinting().create()
-            .toJson(sonarIssueMapper.getMappedIssues(), writer);
+            .toJson(sonarIssueMapper.getMappedIssues(ignoreTests), writer);
     writer.flush();
   }
 

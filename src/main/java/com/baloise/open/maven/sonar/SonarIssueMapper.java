@@ -7,6 +7,7 @@ import com.baloise.open.maven.sonar.dto.Issues;
 import com.baloise.open.maven.sonar.dto.Location;
 import com.baloise.open.maven.sonar.dto.TextRange;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,7 +190,20 @@ public class SonarIssueMapper implements ParserCallback {
             codeQlRules.size(), codeQlResults.size(), mappedIssues.getIssues().size());
   }
 
-  public List<Issue> getMappedIssues() {
-    return mappedIssues.getIssues();
+  public List<Issue> getMappedIssues(boolean ignoreTests) {
+    return (ignoreTests)
+            ? mappedIssues.getIssues().stream().filter(this::isNotTestResource).collect(Collectors.toList())
+            : mappedIssues.getIssues();
   }
+
+  private boolean isNotTestResource(Issue issue) {
+    final Location primaryLocation = issue.getPrimaryLocation();
+    if (primaryLocation == null) {
+      return false;
+    }
+
+    final String filePath = primaryLocation.getFilePath();
+    return (StringUtils.isBlank(filePath) || !filePath.contains("/test/java/"));
+  }
+
 }

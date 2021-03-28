@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,12 +22,12 @@ class SonarIssueMapperTest {
     final SonarIssueMapper testee = new SonarIssueMapper();
 
     assertEquals("parsed 0 Rules, 0 Results from codeQL resulting in 0 issues.", testee.getSummary());
-    assertEquals(0, testee.getMappedIssues().size());
+    assertEquals(0, testee.getMappedIssues(false).size());
 
-    testee.onFinding(createTestResult());
+    testee.onFinding(createTestResult("testUri"));
 
     assertEquals("parsed 0 Rules, 1 Results from codeQL resulting in 1 issues.", testee.getSummary());
-    assertEquals(1, testee.getMappedIssues().size());
+    assertEquals(1, testee.getMappedIssues(false).size());
   }
 
   @Test
@@ -35,17 +36,31 @@ class SonarIssueMapperTest {
 
     testee.onDriver(Driver.builder().name("driverName").organization("DriverOrg").semanticVersion("DriverVersion").build());
     testee.onRule(createTestRule());
-    testee.onFinding(createTestResult());
+    testee.onFinding(createTestResult("testUri"));
 
     assertEquals("parsed 1 Rules, 1 Results from codeQL resulting in 1 issues.", testee.getSummary());
-    assertEquals(1, testee.getMappedIssues().size());
+    assertEquals(1, testee.getMappedIssues(false).size());
 
-    final Issue issue = testee.getMappedIssues().get(0);
+    final Issue issue = testee.getMappedIssues(false).get(0);
     assertEquals(TEST_RULE_ID, issue.getRuleId());
     assertEquals(Issue.Severity.BLOCKER, issue.getSeverity());
     assertNotNull(issue.getPrimaryLocation());
     assertNull(issue.getSecondaryLocations());
     assertEquals("DriverOrg driverName vDriverVersion", issue.getEngineId());
+  }
+
+  @Test
+  void testMappedIssues_FilterResults() {
+    final SonarIssueMapper testee = new SonarIssueMapper();
+    testee.onDriver(Driver.builder().name("driverName").organization("DriverOrg").semanticVersion("DriverVersion").build());
+    testee.onRule(createTestRule());
+    testee.onFinding(createTestResult("src/test/java/MyTestClass.java"));
+    testee.onFinding(createTestResult("src/main/java/MyClass.java"));
+
+    assertEquals(2, testee.getMappedIssues(false).size());
+    final List<Issue> mappedIssuesFiltered = testee.getMappedIssues(true);
+    assertEquals(1, mappedIssuesFiltered.size());
+    assertEquals("src/main/java/MyClass.java", mappedIssuesFiltered.get(0).getPrimaryLocation().getFilePath());
   }
 
   @Test
@@ -196,12 +211,12 @@ class SonarIssueMapperTest {
             .build();
   }
 
-  private Result createTestResult() {
+  private Result createTestResult(String uri) {
     return Result.builder()
             .message("TestMessage")
             .ruleId(TEST_RULE_ID)
             .ruleIndex(4)
-            .locations(Collections.singletonList(createTestLocation("testUri", 4, 1, 2, 3)))
+            .locations(Collections.singletonList(createTestLocation(uri, 4, 1, 2, 3)))
             .build();
   }
 

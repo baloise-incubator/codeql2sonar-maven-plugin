@@ -15,10 +15,10 @@ class SonarIssueReporterTest {
 
   @Test
   void execute_FileMissing_ExceptionExpected() {
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ").execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ").execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null, false).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null, false).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ", false).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ", false).execute());
   }
 
   @Test
@@ -26,7 +26,7 @@ class SonarIssueReporterTest {
     final File input = new File("src/test/resources/anyOther.json");
     assertTrue(input.isFile());
 
-    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null);
+    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath());
     final MojoExecutionException mojoExecutionException = assertThrows(MojoExecutionException.class, testee::execute);
     assertEquals("$schema not found in root object.", mojoExecutionException.getMessage());
   }
@@ -38,7 +38,23 @@ class SonarIssueReporterTest {
     final File expected = new File("src/test/resources/expectedResult.json");
     assertTrue(expected.isFile());
 
-    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null);
+    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath());
+    final StringWriter testwriter = new StringWriter();
+    testee.setWriter(testwriter);
+    testee.execute();
+
+    final String expectedString = FileUtils.fileRead(expected).trim().replace("\n", "").replace("\r", "");
+    assertEquals(expectedString, testwriter.toString().trim().replace("\n", "").replace("\r", ""));
+  }
+
+  @Test
+  void testWithFilter() throws MojoExecutionException, IOException {
+    final File input = new File("src/test/resources/InputWithTestResource.sarif");
+    assertTrue(input.isFile());
+    final File expected = new File("src/test/resources/expectedResult.json");
+    assertTrue(expected.isFile());
+
+    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null, true);
     final StringWriter testwriter = new StringWriter();
     testee.setWriter(testwriter);
     testee.execute();
