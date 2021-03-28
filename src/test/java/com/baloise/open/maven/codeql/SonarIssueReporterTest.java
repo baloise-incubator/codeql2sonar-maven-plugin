@@ -15,10 +15,10 @@ class SonarIssueReporterTest {
 
   @Test
   void execute_FileMissing_ExceptionExpected() {
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null, false).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null, false).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ", false).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ", false).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null, false, null).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null, false, null).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ", false, null).execute());
+    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ", false, null).execute());
   }
 
   @Test
@@ -54,7 +54,7 @@ class SonarIssueReporterTest {
     final File expected = new File("src/test/resources/expectedResult.json");
     assertTrue(expected.isFile());
 
-    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null, true);
+    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null, true, null);
     final StringWriter testwriter = new StringWriter();
     testee.setWriter(testwriter);
     testee.execute();

@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Setter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -35,6 +36,9 @@ public class SonarIssueReporter extends AbstractMojo {
   @Parameter(property = "codeql2sonar.sarif.ignoreTests", defaultValue = DEFAULT_IGNORE_TEST_FLAG)
   private boolean ignoreTests;
 
+  @Parameter(property = "codeql2sonar.sarif.path.excludes")
+  private String[] pathExlcudes;
+
   @Setter
   private Writer writer;
 
@@ -45,10 +49,11 @@ public class SonarIssueReporter extends AbstractMojo {
     this.ignoreTests = false;
   }
 
-  public SonarIssueReporter(String sarifInputFile, String target, boolean ignoreTests) {
+  public SonarIssueReporter(String sarifInputFile, String target, boolean ignoreTests, String[] pathExlcudes) {
     this.sarifInputFile = sarifInputFile;
     this.target = target;
     this.ignoreTests = ignoreTests;
+    this.pathExlcudes = pathExlcudes;
   }
 
   @Inject
@@ -76,8 +81,16 @@ public class SonarIssueReporter extends AbstractMojo {
   private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
     getLog().info("writing target " + target);
     new GsonBuilder().setPrettyPrinting().create()
-            .toJson(sonarIssueMapper.getMappedIssues(ignoreTests), writer);
+            .toJson(sonarIssueMapper.getMappedIssues(getPatternsToExclude()), writer);
     writer.flush();
+  }
+
+  private String[] getPatternsToExclude() {
+    if (ignoreTests) {
+      final String[] testExclusion = {"src/test/"};
+      return pathExlcudes == null ? testExclusion : ArrayUtils.addAll(pathExlcudes, testExclusion);
+    }
+    return pathExlcudes;
   }
 
   private File readSarifFile(String sarifInputFile) throws MojoExecutionException {

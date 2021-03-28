@@ -7,11 +7,12 @@ import com.baloise.open.maven.sonar.dto.Issues;
 import com.baloise.open.maven.sonar.dto.Location;
 import com.baloise.open.maven.sonar.dto.TextRange;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SonarIssueMapper implements ParserCallback {
@@ -190,20 +191,20 @@ public class SonarIssueMapper implements ParserCallback {
             codeQlRules.size(), codeQlResults.size(), mappedIssues.getIssues().size());
   }
 
-  public List<Issue> getMappedIssues(boolean ignoreTests) {
-    return (ignoreTests)
-            ? mappedIssues.getIssues().stream().filter(this::isNotTestResource).collect(Collectors.toList())
+  public List<Issue> getMappedIssues(String[] patternsToExclude) {
+    return (patternsToExclude != null && patternsToExclude.length > 0)
+            ? mappedIssues.getIssues().stream().filter(issue -> !isMatchingExlusionPattern(issue, patternsToExclude)).collect(Collectors.toList())
             : mappedIssues.getIssues();
   }
 
-  private boolean isNotTestResource(Issue issue) {
+  private boolean isMatchingExlusionPattern(Issue issue, String[] patternsToExclude) {
     final Location primaryLocation = issue.getPrimaryLocation();
     if (primaryLocation == null) {
       return false;
     }
-
     final String filePath = primaryLocation.getFilePath();
-    return (StringUtils.isBlank(filePath) || !filePath.contains("/test/java/"));
+    return Arrays.stream(patternsToExclude)
+            .anyMatch(pattern -> Pattern.compile(".*" + pattern + ".*", Pattern.CASE_INSENSITIVE).matcher(filePath).matches());
   }
 
 }

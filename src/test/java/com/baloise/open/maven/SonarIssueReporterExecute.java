@@ -30,10 +30,10 @@ public class SonarIssueReporterExecute {
     final StringWriter stringWriter = new StringWriter();
     final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    gson.toJson(sonarIssueMapper.getMappedIssues(false), stringWriter);
+    gson.toJson(sonarIssueMapper.getMappedIssues(null), stringWriter);
     LOGGER.info(stringWriter.toString());
     try (final FileWriter writer = new FileWriter("C:\\dev\\codeql\\project2scan\\test.json")) {
-      gson.toJson(sonarIssueMapper.getMappedIssues(false), writer);
+      gson.toJson(sonarIssueMapper.getMappedIssues(new String[]{"/test/"}), writer);
       writer.flush();
     }
   }

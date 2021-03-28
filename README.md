@@ -27,4 +27,16 @@ Run to execute ```mvn codeql2sonar:SonarIssueReporter```
 
 ### Optional properties
 - __codeql2sonar.sarif.outputfile__: location where to write the parsed result.
-  _Default: target/sonar/codeql2sonar.json_
+  <br/>_Default: target/sonar/codeql2sonar.json_
+- __codeql2sonar.sarif.ignoreTests__: if set to true, resources containing '/test/' in artifact location 
+  are not reported to Sonar.<br/>_Default: false_
+- __codeql2sonar.sarif.path.excludes__: Array of artifact locations to be excluded from result.
+  Regex-patterns can be used here according to pattern ```.*<codeql2sonar.sarif.path.excludes.value>.*``` 
+  while patterns are compiled case-insensitive.
+  <br/>Example:
+  ```xml
+  <codeql2sonar.sarif.path.excludes>
+    <param>value1</param>
+    <param>value2</param>
+  </codeql2sonar.sarif.path.excludes>
+  ```
