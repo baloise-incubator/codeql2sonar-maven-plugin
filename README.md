@@ -1,5 +1,6 @@
 [![CI](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions/workflows/codeql-analysis.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=baloise-incubator_codeql2sonar-maven-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=baloise-incubator_codeql2sonar-maven-plugin)
 
 # codeql2sonar-maven-plugin
 It is a Maven Plugin parsing SARIF files which were created by conducted CodeQL scan. The parsed result is provided to
