@@ -95,6 +95,8 @@ public class SonarIssueMapper implements ParserCallback {
               return Issue.Severity.MAJOR;
             case "very-high":
               return Issue.Severity.CRITICAL;
+            default:
+              // not decisive yet
           }
         }
         // if not set or unknown consider level as second criteria
@@ -109,6 +111,8 @@ public class SonarIssueMapper implements ParserCallback {
               return Issue.Severity.CRITICAL;
             case "very-high":
               return Issue.Severity.BLOCKER;
+            default:
+              // not decisive yet
           }
         }
         // if not set or unknown consider level as second criteria

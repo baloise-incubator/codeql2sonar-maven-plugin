@@ -19,7 +19,7 @@ public class SarifParser {
 
   static final Logger LOGGER = Logger.getLogger(SarifParser.class.getName());
 
-  static final String ELEMENT_$SCHEMA = "$schema";
+  static final String ELEMENT_SCHEMA = "$schema";
   static final String ELEMENT_ARTIFACT_LOCATION = "artifactLocation";
   static final String ELEMENT_DEFAULT_CONFIGURATION = "defaultConfiguration";
   static final String ELEMENT_DESCRIPTION = "description";
@@ -55,6 +55,10 @@ public class SarifParser {
   static final String ELEMENT_URI_BASE_ID = "uriBaseId";
   static final String ELEMENT_VERSION = "version";
 
+  private SarifParser() {
+    // hide public constructor to not instantiate class
+  }
+
   /**
    * Entry point to parse provided SarifFile. Expected file should be of schema
    * https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json
@@ -72,8 +76,8 @@ public class SarifParser {
       Arrays.stream(callback).forEach(cb -> cb.onVersion(version));
     }
 
-    if (rootObject.has(ELEMENT_$SCHEMA)) {
-      final String schema = rootObject.get(SarifParser.ELEMENT_$SCHEMA).getAsString();
+    if (rootObject.has(ELEMENT_SCHEMA)) {
+      final String schema = rootObject.get(SarifParser.ELEMENT_SCHEMA).getAsString();
       Arrays.stream(callback).forEach(cb -> cb.onSchema(schema));
     }
 
@@ -98,7 +102,7 @@ public class SarifParser {
         final Driver driverDto = parseDriver(driver);
         Arrays.stream(callback).forEach(cb -> cb.onDriver(driverDto));
 
-        if (driver.has(ELEMENT_RULES)) {
+        if (driver != null && driver.has(ELEMENT_RULES)) {
           driver.get(ELEMENT_RULES).getAsJsonArray().forEach(rule -> {
             final JsonObject jsonObjectRule = rule.getAsJsonObject();
             final Rule ruleDto = Rule.builder()

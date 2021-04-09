@@ -66,8 +66,8 @@ public class SonarIssueReporter extends AbstractMojo {
       final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
       final File inputFile = readSarifFile(this.sarifInputFile);
       SarifParser.execute(inputFile, new ConsoleParser(getLog()), sonarIssueMapper);
-      try (final Writer writer = getWriter()) {
-        writeResult(sonarIssueMapper, writer);
+      try (final Writer resultWriter = getWriter()) {
+        writeResult(sonarIssueMapper, resultWriter);
       }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage());
