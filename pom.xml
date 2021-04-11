@@ -9,6 +9,20 @@
   <name>Maven plugin converting SARIF files</name>
   <description>Maven plugin parsing SARIF files created by CodeQL to be used for SonarQube issueReporter.</description>
 
+  <developers>
+    <developer>
+      <id>arburk</id>
+      <name>Arno Burkhart</name>
+      <email>arno.burkhart@baloise.ch</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</connection>
+    <developerConnection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</developerConnection>
+    <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
+  </scm>
+
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -63,7 +77,7 @@
         <version>3.0.0-M5</version>
         <configuration>
           <argLine>${jacocoArgLine}</argLine>
-          <reportsDirectory>${project.test.result.directory}/surefire</reportsDirectory>
+          <reportsDirectory>${project.build.directory}/surefire</reportsDirectory>
         </configuration>
       </plugin>
     </plugins>
@@ -95,7 +109,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.16</version>
+      <version>1.18.20</version>
       <scope>provided</scope>
     </dependency>
 
