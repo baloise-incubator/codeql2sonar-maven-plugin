@@ -109,43 +109,43 @@ class SonarIssueMapperTest {
     final SonarIssueMapper testee = new SonarIssueMapper();
     assertNull(testee.mapRuleToIssueSeverity(null, null));
     assertNull(testee.mapRuleToIssueSeverity(null, RuleProperties.builder().build()));
-    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.none, RuleProperties.builder().build()));
-    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.note, RuleProperties.builder().build()));
-    assertEquals(Issue.Severity.MAJOR, testee.mapRuleToIssueSeverity(Rule.Level.warning, RuleProperties.builder().build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.error, RuleProperties.builder().build()));
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.NONE, RuleProperties.builder().build()));
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.NOTE, RuleProperties.builder().build()));
+    assertEquals(Issue.Severity.MAJOR, testee.mapRuleToIssueSeverity(Rule.Level.WARNING, RuleProperties.builder().build()));
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.ERROR, RuleProperties.builder().build()));
   }
 
   @Test
   void testMapRuleToIssueSeverity() {
     final SonarIssueMapper testee = new SonarIssueMapper();
 
-    assertEquals(Issue.Severity.INFO, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.INFO, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.recommendation).build()));
 
     assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(null
             , RuleProperties.builder().severity(RuleProperties.Severity.warning).build()));
-    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("medium").build()));
-    assertEquals(Issue.Severity.MAJOR, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.MAJOR, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("high").build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("very-high").build()));
     assertEquals(Issue.Severity.MINOR, testee.mapRuleToIssueSeverity(null
             , RuleProperties.builder().severity(RuleProperties.Severity.warning).precision("<invalid>").build()));
 
     assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(null
             , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
-    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.error
+    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.ERROR
             , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.error).build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("medium").build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("high").build()));
-    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.BLOCKER, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("very-high").build()));
-    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.none
+    assertEquals(Issue.Severity.CRITICAL, testee.mapRuleToIssueSeverity(Rule.Level.NONE
             , RuleProperties.builder().severity(RuleProperties.Severity.error).precision("<invalid>").build()));
 
     assertNull(testee.mapRuleToIssueSeverity(null, RuleProperties.builder().build()));
@@ -215,7 +215,7 @@ class SonarIssueMapperTest {
   private Rule createTestRule() {
     return Rule.builder()
             .id(TEST_RULE_ID)
-            .level(Rule.Level.error)
+            .level(Rule.Level.ERROR)
             .name("TestRuleName")
             .properties(RuleProperties.builder()
                     .severity(RuleProperties.Severity.error)

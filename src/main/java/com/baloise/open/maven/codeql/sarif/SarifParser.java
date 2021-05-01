@@ -24,10 +24,7 @@ import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class SarifParser {
@@ -152,7 +149,7 @@ public class SarifParser {
       if (defaultConfig.has(ELEMENT_LEVEL)) {
         final String levelAsString = defaultConfig.get(ELEMENT_LEVEL).getAsString();
         try {
-          return Rule.Level.valueOf(levelAsString);
+          return Rule.Level.valueOf(levelAsString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
           LOGGER.warning(String.format("Failed to interpret %s as Rule.Level: %s", levelAsString, e.getMessage()));
         }

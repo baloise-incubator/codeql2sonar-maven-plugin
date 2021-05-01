@@ -131,7 +131,7 @@ public class SonarIssueMapper implements ParserCallback {
           }
         }
         // if not set or unknown consider level as second criteria
-        if (level == Rule.Level.error) {
+        if (level == Rule.Level.ERROR) {
           return Issue.Severity.BLOCKER;
         }
         return Issue.Severity.CRITICAL;
@@ -142,12 +142,12 @@ public class SonarIssueMapper implements ParserCallback {
 
   private Issue.Severity mapRuleLevelToSeverity(Rule.Level level) {
     switch (level) {
-      case none:
-      case note:
+      case NONE:
+      case NOTE:
         return Issue.Severity.MINOR;
-      case warning:
+      case WARNING:
         return Issue.Severity.MAJOR;
-      case error:
+      case ERROR:
         return Issue.Severity.CRITICAL;
     }
     return null;

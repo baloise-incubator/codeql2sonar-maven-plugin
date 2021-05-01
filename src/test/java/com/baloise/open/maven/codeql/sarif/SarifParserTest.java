@@ -83,7 +83,7 @@ class SarifParserTest {
     assertEquals("Impossible array cast", impossibleArrayCast.getShortDescription());
     assertEquals("Trying to cast an array of a particular type as an array of a subtype causes a 'ClassCastException' at runtime.", impossibleArrayCast.getFullDescription());
     assertNotNull(impossibleArrayCast.getLevel());
-    assertEquals(Rule.Level.error, impossibleArrayCast.getLevel());
+    assertEquals(Rule.Level.ERROR, impossibleArrayCast.getLevel());
     assertNotNull(impossibleArrayCast.getProperties());
     final RuleProperties icProperties = impossibleArrayCast.getProperties();
     assertEquals("java/impossible-array-cast", icProperties.getId());
