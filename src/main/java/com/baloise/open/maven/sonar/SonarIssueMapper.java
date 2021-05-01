@@ -210,10 +210,10 @@ public class SonarIssueMapper implements ParserCallback {
             codeQlRules.size(), codeQlResults.size(), mappedIssues.getIssues().size());
   }
 
-  public List<Issue> getMappedIssues(String[] patternsToExclude) {
+  public Issues getMappedIssues(String[] patternsToExclude) {
     return (patternsToExclude != null && patternsToExclude.length > 0)
-            ? mappedIssues.getIssues().stream().filter(issue -> !isMatchingExlusionPattern(issue, patternsToExclude)).collect(Collectors.toList())
-            : mappedIssues.getIssues();
+            ? mappedIssues.applyFilter((issue -> !isMatchingExlusionPattern(issue, patternsToExclude)))
+            : mappedIssues;
   }
 
   private boolean isMatchingExlusionPattern(Issue issue, String[] patternsToExclude) {

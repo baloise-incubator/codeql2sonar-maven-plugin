@@ -15,18 +15,26 @@
  */
 package com.baloise.open.maven.sonar.dto;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Main object of exported Sonar Issue Report.
  * See also Generic Issue Import Format https://docs.sonarqube.org/latest/analysis/generic-issue/
  */
-@Getter
-public class Issues {
+public final class Issues {
 
   private final List<Issue> issues = new ArrayList<>();
 
+  public List<Issue> getIssues() {
+    return issues;
+  }
+
+  public Issues applyFilter(Predicate<Issue> predicate) {
+    final Issues filteredIssues = new Issues();
+    filteredIssues.getIssues().addAll(this.getIssues().stream().filter(predicate).collect(Collectors.toList()));
+    return filteredIssues;
+  }
 }
