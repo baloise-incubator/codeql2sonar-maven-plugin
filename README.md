@@ -16,7 +16,7 @@ add the following plugin to your pom.xml
 <plugin>
   <groupId>com.baloise.open</groupId>
   <artifactId>codeql2sonar-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
 </plugin>
 ```
 

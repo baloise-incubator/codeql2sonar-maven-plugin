@@ -33,13 +33,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 import javax.inject.Inject;
 import java.io.*;
 
-// TODO: add options to configure level to log output
-
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
 
   private static final String ERR_FILE_SUFFIX = "Verify parameter codeql2sonar.sarif.inputfile in your pom.xml";
-  private static final String DEFAULT_OURPUT_FILE = "target/sonar/codeql2sonar.json";
+  private static final String DEFAULT_OURPUT_FILE = "./target/sonar/codeql2sonar.json";
   private static final String DEFAULT_IGNORE_TEST_FLAG = "false";
 
   @Parameter(property = "codeql2sonar.sarif.inputfile")
@@ -60,7 +58,7 @@ public class SonarIssueReporter extends AbstractMojo {
   public SonarIssueReporter(String sarifInputFile) {
     this.sarifInputFile = sarifInputFile;
     /* set defaults */
-    this.target = DEFAULT_OURPUT_FILE;
+    this.target = DEFAULT_OURPUT_FILE.replace("/", File.separator);
     this.ignoreTests = false;
   }
 
