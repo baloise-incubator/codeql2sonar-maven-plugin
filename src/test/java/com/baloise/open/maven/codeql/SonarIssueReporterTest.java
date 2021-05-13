@@ -15,10 +15,10 @@ class SonarIssueReporterTest {
 
   @Test
   void execute_FileMissing_ExceptionExpected() {
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, null, false, null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", null, false, null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter(null, "   ", false, null).execute());
-    assertThrows(MojoExecutionException.class, () ->  new SonarIssueReporter("   ", "   ", false, null).execute());
+    assertThrows(MojoExecutionException.class, () -> new SonarIssueReporter(null, null, false, null).execute());
+    assertThrows(MojoExecutionException.class, () -> new SonarIssueReporter("   ", null, false, null).execute());
+    assertThrows(MojoExecutionException.class, () -> new SonarIssueReporter(null, "   ", false, null).execute());
+    assertThrows(MojoExecutionException.class, () -> new SonarIssueReporter("   ", "   ", false, null).execute());
   }
 
   @Test
@@ -31,30 +31,29 @@ class SonarIssueReporterTest {
     assertEquals("$schema not found in root object.", mojoExecutionException.getMessage());
   }
 
+
   @Test
   void testHappyCase() throws MojoExecutionException, IOException {
-    final File input = new File("src/test/resources/example.sarif");
-    assertTrue(input.isFile());
-    final File expected = new File("src/test/resources/expectedResult.json");
-    assertTrue(expected.isFile());
-
-    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath());
-    final StringWriter testwriter = new StringWriter();
-    testee.setWriter(testwriter);
-    testee.execute();
-
-    final String expectedString = FileUtils.fileRead(expected).trim().replace("\n", "").replace("\r", "");
-    assertEquals(expectedString, testwriter.toString().trim().replace("\n", "").replace("\r", ""));
+    testByResourceFiles("src/test/resources/example.sarif", "src/test/resources/expectedResult.json", false);
   }
 
   @Test
   void testWithFilter() throws MojoExecutionException, IOException {
-    final File input = new File("src/test/resources/InputWithTestResource.sarif");
+    testByResourceFiles("src/test/resources/InputWithTestResource.sarif", "src/test/resources/expectedResult.json", true);
+  }
+
+  @Test
+  void multiModuleTest() throws MojoExecutionException, IOException {
+    testByResourceFiles("src/test/resources/multiModuleInput.sarif", "src/test/resources/multiModuleResult.json", false);
+  }
+
+  private void testByResourceFiles(String inputSarifFIle, String expectedResultFile, boolean ignoreTests) throws MojoExecutionException, IOException {
+    final File input = new File(inputSarifFIle);
     assertTrue(input.isFile());
-    final File expected = new File("src/test/resources/expectedResult.json");
+    final File expected = new File(expectedResultFile);
     assertTrue(expected.isFile());
 
-    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null, true, null);
+    final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath(), null, ignoreTests, null);
     final StringWriter testwriter = new StringWriter();
     testee.setWriter(testwriter);
     testee.execute();
