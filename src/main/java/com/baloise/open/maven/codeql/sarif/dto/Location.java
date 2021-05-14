@@ -16,9 +16,11 @@
 package com.baloise.open.maven.codeql.sarif.dto;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder(toBuilder = true)
 public class Location {
 

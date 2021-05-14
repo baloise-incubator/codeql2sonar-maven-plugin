@@ -196,7 +196,6 @@ public class SonarIssueMapper implements ParserCallback {
     if (region == null) {
       return null;
     }
-    // TODO: verify if offset needs to be recalculated
     return TextRange.builder()
             .startLine(region.getStartLine())
             .endLine(region.getStartLine())
