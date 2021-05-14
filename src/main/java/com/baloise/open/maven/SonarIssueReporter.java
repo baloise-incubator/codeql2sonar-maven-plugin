@@ -79,12 +79,29 @@ public class SonarIssueReporter extends AbstractMojo {
       final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
       final File inputFile = readSarifFile(this.sarifInputFile);
       SarifParser.execute(inputFile, new ConsoleParser(getLog()), sonarIssueMapper);
+      correctPathes(sonarIssueMapper);
       try (final Writer resultWriter = getWriter()) {
         writeResult(sonarIssueMapper, resultWriter);
       }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage());
     }
+  }
+
+  /**
+   * remove module prefix in filePath in case of multiModuleBuild
+   */
+  private void correctPathes(SonarIssueMapper sonarIssueMapper) {
+    //TODO: read from pom.xml if set to detect deviations from convention, i.e. <sourceDirectory>src/main/java</sourceDirectory>
+    final String srcDirStart = "src/";
+    final String srcDirStartPrefixed = "/" + srcDirStart;
+
+    sonarIssueMapper.getMappedIssues(null).getIssues().forEach(issue -> {
+      final String filePath = issue.getPrimaryLocation().getFilePath();
+      if (!filePath.startsWith(srcDirStart) && filePath.contains(srcDirStartPrefixed)) {
+        issue.getPrimaryLocation().setFilePath(filePath.substring(filePath.indexOf(srcDirStartPrefixed) + 1));
+      }
+    });
   }
 
   private Writer getWriter() throws IOException {
