@@ -101,7 +101,15 @@ class SonarIssueMapperTest {
   }
 
   @Test
-  void testMapSeverity() {
+  void testMapSeverity_noMatch_ReturnInfo() {
+    final SonarIssueMapper testee = new SonarIssueMapper();
+    assertEquals(Issue.Severity.INFO, testee.mapSeverity(null));
+
+    final Rule testRule = createTestRule();
+    testRule.getProperties().setSeverity(null);
+    testee.onRule(testRule);
+
+    assertEquals(Issue.Severity.INFO, testee.mapSeverity(TEST_RULE_ID));
   }
 
   @Test
@@ -180,6 +188,9 @@ class SonarIssueMapperTest {
     assertEquals(27, textRange.getStartLine());
     assertEquals(5, textRange.getStartColumn());
     assertEquals(6, textRange.getEndColumn());
+
+    assertNull(testee.mapPrimaryLocation(Result.builder().locations(null).build()));
+    assertNull(testee.mapPrimaryLocation(Result.builder().locations(Collections.EMPTY_LIST).build()));
   }
 
   @Test

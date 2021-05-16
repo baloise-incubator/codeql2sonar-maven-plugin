@@ -102,42 +102,49 @@ public class SonarIssueMapper implements ParserCallback {
         return Issue.Severity.INFO;
       case warning:
         // consider precision as first criteria
-        if (rulePrecision != null) {
-          switch (rulePrecision.toLowerCase()) {
-            case "medium":
-              return Issue.Severity.MINOR;
-            case "high":
-              return Issue.Severity.MAJOR;
-            case "very-high":
-              return Issue.Severity.CRITICAL;
-            default:
-              // not decisive yet
-          }
-        }
-        // if not set or unknown consider level as second criteria
-        return (level == null) ? Issue.Severity.MINOR : mapRuleLevelToSeverity(level);
-
+        return mapRuleSeverityWarning(level, rulePrecision);
       case error:
         // consider precision as first criteria
-        if (rulePrecision != null) {
-          switch (rulePrecision.toLowerCase()) {
-            case "medium":
-            case "high":
-              return Issue.Severity.CRITICAL;
-            case "very-high":
-              return Issue.Severity.BLOCKER;
-            default:
-              // not decisive yet
-          }
-        }
-        // if not set or unknown consider level as second criteria
-        if (level == Rule.Level.ERROR) {
-          return Issue.Severity.BLOCKER;
-        }
-        return Issue.Severity.CRITICAL;
+        return mapRuleSeverityError(level, rulePrecision);
     }
 
     return null;
+  }
+
+  private Issue.Severity mapRuleSeverityError(Rule.Level level, String rulePrecision) {
+    if (rulePrecision != null) {
+      switch (rulePrecision.toLowerCase()) {
+        case "medium":
+        case "high":
+          return Issue.Severity.CRITICAL;
+        case "very-high":
+          return Issue.Severity.BLOCKER;
+        default:
+          // not decisive yet
+      }
+    }
+    // if not set or unknown consider level as second criteria
+    if (level == Rule.Level.ERROR) {
+      return Issue.Severity.BLOCKER;
+    }
+    return Issue.Severity.CRITICAL;
+  }
+
+  private Issue.Severity mapRuleSeverityWarning(Rule.Level level, String rulePrecision) {
+    if (rulePrecision != null) {
+      switch (rulePrecision.toLowerCase()) {
+        case "medium":
+          return Issue.Severity.MINOR;
+        case "high":
+          return Issue.Severity.MAJOR;
+        case "very-high":
+          return Issue.Severity.CRITICAL;
+        default:
+          // not decisive yet
+      }
+    }
+    // if not set or unknown consider level as second criteria
+    return (level == null) ? Issue.Severity.MINOR : mapRuleLevelToSeverity(level);
   }
 
   private Issue.Severity mapRuleLevelToSeverity(Rule.Level level) {
