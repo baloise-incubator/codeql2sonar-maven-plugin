@@ -48,36 +48,35 @@ class SarifParserTest {
     assertEquals("https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", schemaCaptor.getValue());
 
     Mockito.verify(mockedParserCB, Mockito.times(1)).onDriver(driverCaptor.capture());
-    final Driver driverCaptured = driverCaptor.getValue();
-    assertEquals("GitHub", driverCaptured.getOrganization());
-    assertEquals("CodeQL", driverCaptured.getName());
-    assertEquals("2.3.3", driverCaptured.getSemanticVersion());
+    verifyDriver(driverCaptor.getValue());
 
     Mockito.verify(mockedParserCB, Mockito.times(10)).onRule(ruleCaptor.capture());
     final List<Rule> rulesCaptured = ruleCaptor.getAllValues();
-    final Rule emptySynchBlock = rulesCaptured.get(2);
-    assertEquals("java/empty-synchronized-block", emptySynchBlock.getId());
-    assertEquals("java/empty-synchronized-block", emptySynchBlock.getName());
-    assertEquals("Empty synchronized block", emptySynchBlock.getShortDescription());
-    assertEquals("Empty synchronized blocks may indicate the presence of incomplete code or incorrect synchronization, and may lead to concurrency problems.", emptySynchBlock.getFullDescription());
-    assertNull(emptySynchBlock.getLevel());
-    assertNotNull(emptySynchBlock.getProperties());
-    final RuleProperties esbProperties = emptySynchBlock.getProperties();
-    assertEquals("java/empty-synchronized-block", esbProperties.getId());
-    assertEquals("Empty synchronized block", esbProperties.getName());
-    assertEquals("Empty synchronized blocks may indicate the presence of\n              incomplete code or incorrect synchronization, and may lead to concurrency problems.", esbProperties.getDescription());
-    assertEquals("low", esbProperties.getPrecision());
-    assertEquals("problem", esbProperties.getKind());
-    assertEquals(RuleProperties.Severity.warning, esbProperties.getSeverity());
-    final String[] esbTags = esbProperties.getTags();
-    assertEquals(5, esbTags.length);
-    assertEquals(1, Arrays.stream(esbTags).filter("reliability"::equals).count());
-    assertEquals(1, Arrays.stream(esbTags).filter("correctness"::equals).count());
-    assertEquals(1, Arrays.stream(esbTags).filter("concurrency"::equals).count());
-    assertEquals(1, Arrays.stream(esbTags).filter("language-features"::equals).count());
-    assertEquals(1, Arrays.stream(esbTags).filter("external/cwe/cwe-585"::equals).count());
+    verifyRule_EmptySynchBlock(rulesCaptured.get(2));
+    verifyRule_impossibleArrayCast(rulesCaptured.get(3));
 
-    final Rule impossibleArrayCast = rulesCaptured.get(3);
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onFinding(resultCaptor.capture());
+    verifyResult(resultCaptor.getValue());
+  }
+
+  private void verifyResult(Result result) {
+    assertEquals("java/misleading-indentation", result.getRuleId());
+    assertEquals(9, result.getRuleIndex());
+    assertEquals("Indentation suggests that [the next statement](1) belongs to [the control structure](2), but this is not the case; consider adding braces or adjusting indentation.", result.getMessage());
+    assertNotNull(result.getLocations());
+    assertEquals(1, result.getLocations().size());
+    final Location location = result.getLocations().get(0);
+    assertEquals("src/main/java/org/arburk/fishbone/infrastructure/service/FishRepository.java", location.getUri());
+    assertEquals("%SRCROOT%", location.getUriBaseId());
+    assertEquals(0, location.getIndex());
+    assertNotNull(location.getRegion());
+    final Region region = location.getRegion();
+    assertEquals(26, region.getStartLine());
+    assertEquals(9, region.getStartColumn());
+    assertEquals(13, region.getEndColumn());
+  }
+
+  private void verifyRule_impossibleArrayCast(Rule impossibleArrayCast) {
     assertEquals("java/impossible-array-cast", impossibleArrayCast.getId());
     assertEquals("java/impossible-array-cast", impossibleArrayCast.getName());
     assertEquals("Impossible array cast", impossibleArrayCast.getShortDescription());
@@ -98,23 +97,35 @@ class SarifParserTest {
     assertEquals(1, Arrays.stream(icTags).filter("correctness"::equals).count());
     assertEquals(1, Arrays.stream(icTags).filter("logic"::equals).count());
     assertEquals(1, Arrays.stream(icTags).filter("external/cwe/cwe-704"::equals).count());
+  }
 
-    Mockito.verify(mockedParserCB, Mockito.times(1)).onFinding(resultCaptor.capture());
-    final Result result = resultCaptor.getValue();
-    assertEquals("java/misleading-indentation", result.getRuleId());
-    assertEquals(9, result.getRuleIndex());
-    assertEquals("Indentation suggests that [the next statement](1) belongs to [the control structure](2), but this is not the case; consider adding braces or adjusting indentation.", result.getMessage());
-    assertNotNull(result.getLocations());
-    assertEquals(1, result.getLocations().size());
-    final Location location = result.getLocations().get(0);
-    assertEquals("src/main/java/org/arburk/fishbone/infrastructure/service/FishRepository.java", location.getUri());
-    assertEquals("%SRCROOT%", location.getUriBaseId());
-    assertEquals(0, location.getIndex());
-    assertNotNull(location.getRegion());
-    final Region region = location.getRegion();
-    assertEquals(26, region.getStartLine());
-    assertEquals(9, region.getStartColumn());
-    assertEquals(13, region.getEndColumn());
+  private void verifyRule_EmptySynchBlock(Rule emptySynchBlock) {
+    assertEquals("java/empty-synchronized-block", emptySynchBlock.getId());
+    assertEquals("java/empty-synchronized-block", emptySynchBlock.getName());
+    assertEquals("Empty synchronized block", emptySynchBlock.getShortDescription());
+    assertEquals("Empty synchronized blocks may indicate the presence of incomplete code or incorrect synchronization, and may lead to concurrency problems.", emptySynchBlock.getFullDescription());
+    assertNull(emptySynchBlock.getLevel());
+    assertNotNull(emptySynchBlock.getProperties());
+    final RuleProperties esbProperties = emptySynchBlock.getProperties();
+    assertEquals("java/empty-synchronized-block", esbProperties.getId());
+    assertEquals("Empty synchronized block", esbProperties.getName());
+    assertEquals("Empty synchronized blocks may indicate the presence of\n              incomplete code or incorrect synchronization, and may lead to concurrency problems.", esbProperties.getDescription());
+    assertEquals("low", esbProperties.getPrecision());
+    assertEquals("problem", esbProperties.getKind());
+    assertEquals(RuleProperties.Severity.warning, esbProperties.getSeverity());
+    final String[] esbTags = esbProperties.getTags();
+    assertEquals(5, esbTags.length);
+    assertEquals(1, Arrays.stream(esbTags).filter("reliability"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("correctness"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("concurrency"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("language-features"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("external/cwe/cwe-585"::equals).count());
+  }
+
+  private void verifyDriver(Driver driverCaptured) {
+    assertEquals("GitHub", driverCaptured.getOrganization());
+    assertEquals("CodeQL", driverCaptured.getName());
+    assertEquals("2.3.3", driverCaptured.getSemanticVersion());
   }
 
   @Test
