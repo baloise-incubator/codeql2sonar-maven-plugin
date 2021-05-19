@@ -96,7 +96,7 @@ public class SonarIssueReporter extends AbstractMojo {
     final String srcDirStart = "src/";
     final String srcDirStartPrefixed = "/" + srcDirStart;
 
-    sonarIssueMapper.getMappedIssues(null).getIssues().forEach(issue -> {
+    sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
       final String filePath = issue.getPrimaryLocation().getFilePath();
       if (!filePath.startsWith(srcDirStart) && filePath.contains(srcDirStartPrefixed)) {
         issue.getPrimaryLocation().setFilePath(filePath.substring(filePath.indexOf(srcDirStartPrefixed) + 1));

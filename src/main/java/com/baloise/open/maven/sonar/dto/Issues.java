@@ -15,6 +15,8 @@
  */
 package com.baloise.open.maven.sonar.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -26,15 +28,16 @@ import java.util.stream.Collectors;
  */
 public final class Issues {
 
-  private final List<Issue> issues = new ArrayList<>();
+  @SerializedName(value = "issues")
+  private final List<Issue> result = new ArrayList<>();
 
-  public List<Issue> getIssues() {
-    return issues;
+  public List<Issue> getResult() {
+    return result;
   }
 
   public Issues applyFilter(Predicate<Issue> predicate) {
     final Issues filteredIssues = new Issues();
-    filteredIssues.getIssues().addAll(this.getIssues().stream().filter(predicate).collect(Collectors.toList()));
+    filteredIssues.getResult().addAll(this.getResult().stream().filter(predicate).collect(Collectors.toList()));
     return filteredIssues;
   }
 }
