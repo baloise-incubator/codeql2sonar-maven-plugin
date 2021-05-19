@@ -23,11 +23,19 @@ class SonarIssueMapperTest {
 
     assertEquals("parsed 0 Rules, 0 Results from codeQL resulting in 0 issues.", testee.getSummary());
     assertEquals(0, testee.getMappedIssues(null).getResult().size());
+    assertEquals(0, testee.getMappedIssues(new String[0]).getResult().size());
+
+    testee.onFinding(null);
+    assertEquals("parsed 0 Rules, 0 Results from codeQL resulting in 0 issues.", testee.getSummary());
+    assertEquals(0, testee.getMappedIssues(null).getResult().size());
+    assertEquals(0, testee.getMappedIssues(new String[0]).getResult().size());
+
 
     testee.onFinding(createTestResult("testUri"));
 
     assertEquals("parsed 0 Rules, 1 Results from codeQL resulting in 1 issues.", testee.getSummary());
     assertEquals(1, testee.getMappedIssues(null).getResult().size());
+    assertEquals(1, testee.getMappedIssues(new String[0]).getResult().size());
   }
 
   @Test
@@ -162,6 +170,7 @@ class SonarIssueMapperTest {
   @Test
   void testMapType() {
     final SonarIssueMapper testee = new SonarIssueMapper();
+    assertNull(testee.mapType(null));
     assertEquals(Issue.Type.CODE_SMELL, testee.mapType(Issue.Severity.INFO));
     assertEquals(Issue.Type.CODE_SMELL, testee.mapType(Issue.Severity.MINOR));
     assertEquals(Issue.Type.CODE_SMELL, testee.mapType(Issue.Severity.MAJOR));

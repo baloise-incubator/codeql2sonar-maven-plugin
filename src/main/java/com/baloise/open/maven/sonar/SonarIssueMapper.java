@@ -43,8 +43,10 @@ public class SonarIssueMapper implements ParserCallback {
 
   @Override
   public void onFinding(Result result) {
-    codeQlResults.add(result);
-    mappedIssues.getResult().add(mapResult(result));
+    if (result != null) {
+      codeQlResults.add(result);
+      mappedIssues.getResult().add(mapResult(result));
+    }
   }
 
   @Override
@@ -156,12 +158,16 @@ public class SonarIssueMapper implements ParserCallback {
         return Issue.Severity.MAJOR;
       case ERROR:
         return Issue.Severity.CRITICAL;
+      default:
+        return null;
     }
-    return null;
   }
 
   // TODO: verify if mapping is as expected
   Issue.Type mapType(Issue.Severity severity) {
+    if (severity == null) {
+      return null;
+    }
     switch (severity) {
       case INFO:
       case MINOR:
