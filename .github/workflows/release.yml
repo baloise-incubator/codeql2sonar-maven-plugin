@@ -1,0 +1,31 @@
+name: Release
+
+on: 
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Deploy to Github Package Registry
+        env:
+            GITHUB_USERNAME: x-access-token
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn --settings .github/maven-settings.xml deploy
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
