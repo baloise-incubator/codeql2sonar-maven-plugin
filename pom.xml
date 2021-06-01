@@ -23,6 +23,14 @@
     <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Baloise Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -83,7 +91,7 @@
       <plugin>
         <groupId>com.baloise.open</groupId>
         <artifactId>codeql2sonar-maven-plugin</artifactId>
-        <version>${version}</version>
+        <version>${project.version}</version>
       </plugin>
     </plugins>
   </build>
