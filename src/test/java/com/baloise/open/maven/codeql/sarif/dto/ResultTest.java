@@ -22,6 +22,8 @@ class ResultTest extends PropertyReflectionTest {
     assertEquals("Found issue based on rule 'MyRuleId/x': 'null'", testee.toString());
     testee.setMessage("To test the message setter/getter");
     assertEquals("Found issue based on rule 'MyRuleId/x': 'To test the message setter/getter'", testee.toString());
+    testee.setLocations(Collections.EMPTY_LIST);
+    assertEquals("Found issue based on rule 'MyRuleId/x': 'To test the message setter/getter'", testee.toString());
     testee.setLocations(Collections.singletonList(Location.builder().build()));
     assertEquals("Found issue based on rule 'MyRuleId/x': 'To test the message setter/getter'\nin '<URI_MISSING>, n/a'", testee.toString());
   }

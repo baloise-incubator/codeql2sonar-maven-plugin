@@ -84,12 +84,12 @@ public class SarifParser {
     final JsonObject rootObject = JsonParser.parseReader(new FileReader(sarifInputFile)).getAsJsonObject();
 
     if (rootObject.has(ELEMENT_VERSION)) {
-      final String version = rootObject.get(SarifParser.ELEMENT_VERSION).getAsString();
+      final String version = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_VERSION);
       Arrays.stream(callback).forEach(cb -> cb.onVersion(version));
     }
 
     if (rootObject.has(ELEMENT_SCHEMA)) {
-      final String schema = rootObject.get(SarifParser.ELEMENT_SCHEMA).getAsString();
+      final String schema = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_SCHEMA);
       Arrays.stream(callback).forEach(cb -> cb.onSchema(schema));
     }
 
@@ -118,8 +118,8 @@ public class SarifParser {
           driver.get(ELEMENT_RULES).getAsJsonArray().forEach(rule -> {
             final JsonObject jsonObjectRule = rule.getAsJsonObject();
             final Rule ruleDto = Rule.builder()
-                    .id(jsonObjectRule.get(ELEMENT_ID).getAsString())
-                    .name(jsonObjectRule.get(ELEMENT_NAME).getAsString())
+                    .id(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_ID))
+                    .name(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_NAME))
                     .shortDescription(getTextElement(jsonObjectRule, ELEMENT_SHORT_DESCRIPTION))
                     .fullDescription(getTextElement(jsonObjectRule, ELEMENT_FULL_DESCRIPTION))
                     .level(parseDefaultConfigLevel(jsonObjectRule))
@@ -137,9 +137,9 @@ public class SarifParser {
       return null;
     }
     return Driver.builder()
-            .name(driver.get(ELEMENT_NAME).getAsString())
-            .organization(driver.get(ELEMENT_ORGANIZATION).getAsString())
-            .semanticVersion(driver.get(ELEMENT_SEMANTIC_VERSION).getAsString())
+            .name(getObjectAsStringIfExists(driver, ELEMENT_NAME))
+            .organization(getObjectAsStringIfExists(driver, ELEMENT_ORGANIZATION))
+            .semanticVersion(getObjectAsStringIfExists(driver, ELEMENT_SEMANTIC_VERSION))
             .build();
   }
 
@@ -147,7 +147,7 @@ public class SarifParser {
     if (jsonObjectRule.has(ELEMENT_DEFAULT_CONFIGURATION)) {
       final JsonObject defaultConfig = jsonObjectRule.get(ELEMENT_DEFAULT_CONFIGURATION).getAsJsonObject();
       if (defaultConfig.has(ELEMENT_LEVEL)) {
-        final String levelAsString = defaultConfig.get(ELEMENT_LEVEL).getAsString();
+        final String levelAsString = getObjectAsStringIfExists(defaultConfig, ELEMENT_LEVEL);
         try {
           return Rule.Level.valueOf(levelAsString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
@@ -162,11 +162,11 @@ public class SarifParser {
     if (jsonObjectRule.has(ELEMENT_PROPERTIES)) {
       final JsonObject properties = jsonObjectRule.get(ELEMENT_PROPERTIES).getAsJsonObject();
       return RuleProperties.builder()
-              .id(properties.get(ELEMENT_ID).getAsString())
-              .name(properties.get(ELEMENT_NAME).getAsString())
-              .description(properties.get(ELEMENT_DESCRIPTION).getAsString())
-              .kind(properties.get(ELEMENT_KIND).getAsString())
-              .precision(properties.get(ELEMENT_PRECISION).getAsString())
+              .id(getObjectAsStringIfExists(properties, ELEMENT_ID))
+              .name(getObjectAsStringIfExists(properties, ELEMENT_NAME))
+              .description(getObjectAsStringIfExists(properties, ELEMENT_DESCRIPTION))
+              .kind(getObjectAsStringIfExists(properties, ELEMENT_KIND))
+              .precision(getObjectAsStringIfExists(properties, ELEMENT_PRECISION))
               .tags(parseTags(properties))
               .severity(parseProblemSeverity(properties))
               .build();
@@ -174,9 +174,13 @@ public class SarifParser {
     return null;
   }
 
+  private static String getObjectAsStringIfExists(JsonObject properties, String elementId) {
+    return properties != null && properties.has(elementId) ? properties.get(elementId).getAsString() : null;
+  }
+
   private static RuleProperties.Severity parseProblemSeverity(JsonObject properties) {
     if (properties.has(ELEMENT_PROBLEM_SEVERITY)) {
-      final String severityAsString = properties.get(ELEMENT_PROBLEM_SEVERITY).getAsString();
+      final String severityAsString = getObjectAsStringIfExists(properties, ELEMENT_PROBLEM_SEVERITY);
       try {
         return RuleProperties.Severity.valueOf(severityAsString);
       } catch (IllegalArgumentException e) {
@@ -199,7 +203,7 @@ public class SarifParser {
       run.get(ELEMENT_RESULTS).getAsJsonArray().forEach(result -> {
         final JsonObject resultJsonObject = result.getAsJsonObject();
         final Result resultDto = Result.builder()
-                .ruleId(resultJsonObject.get(ELEMENT_RULE_ID).getAsString())
+                .ruleId(getObjectAsStringIfExists(resultJsonObject, ELEMENT_RULE_ID))
                 .ruleIndex(resultJsonObject.get(ELEMENT_RULE_INDEX).getAsInt())
                 .message(getTextElement(resultJsonObject, ELEMENT_MESSAGE))
                 .locations(parseLocations(resultJsonObject))
@@ -211,7 +215,7 @@ public class SarifParser {
   }
 
   private static String getTextElement(JsonObject object, String parentProperty) {
-    return object.get(parentProperty).getAsJsonObject().get(ELEMENT_TEXT).getAsString();
+    return getObjectAsStringIfExists(object.get(parentProperty).getAsJsonObject(), ELEMENT_TEXT);
   }
 
   private static List<Location> parseLocations(JsonObject resultJsonObject) {
@@ -228,8 +232,8 @@ public class SarifParser {
           final JsonObject physicalLocation = locationJsonObject.get(ELEMENT_PHYSICAL_LOCATION).getAsJsonObject();
           final JsonObject artifactLocation = physicalLocation.get(ELEMENT_ARTIFACT_LOCATION).getAsJsonObject();
           result.add(Location.builder()
-                  .uri(artifactLocation.get(ELEMENT_URI).getAsString())
-                  .uriBaseId(artifactLocation.get(ELEMENT_URI_BASE_ID).getAsString())
+                  .uri(getObjectAsStringIfExists(artifactLocation, ELEMENT_URI))
+                  .uriBaseId(getObjectAsStringIfExists(artifactLocation, ELEMENT_URI_BASE_ID))
                   .index(artifactLocation.get(ELEMENT_INDEX).getAsInt())
                   .region(parseRegion(physicalLocation.get(ELEMENT_REGION).getAsJsonObject()))
                   .build());
