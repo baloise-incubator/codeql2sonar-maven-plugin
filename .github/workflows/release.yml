@@ -21,11 +21,12 @@ jobs:
             GITHUB_USERNAME: x-access-token
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn --settings .github/maven-settings.xml deploy
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+#      - name: Release
+#        uses: softprops/action-gh-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          name: Release ${{ github.ref }}
+#          draft: false
+#          prerelease: false
+#

@@ -24,8 +24,8 @@
                 </repository>
                 <repository>
                     <id>github</id>
-                    <name>GitHub Baloise Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/baloise</url>
+                    <name>GitHub Baloise Incubator Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/baloise-incubator</url>
                 </repository>
             </repositories>
         </profile>
