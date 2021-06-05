@@ -78,10 +78,10 @@ class SonarIssueMapperTest {
     assertMatchingIssue(testee, new String[]{"(my[\\S]*\\.java)"}, "src/main/java/another/package/AnyTester.java");
   }
 
-  private void assertMatchingIssue(SonarIssueMapper testee, String[] patternsToExclude, String expectedPathMatchingFirst) {
+  private void assertMatchingIssue(SonarIssueMapper testee, String[] patternsToExclude, String expected1stPath) {
     final Issues mappedIssuesFiltered = testee.getMappedIssues(patternsToExclude);
     assertEquals(1, mappedIssuesFiltered.getResult().size());
-    assertEquals(expectedPathMatchingFirst, mappedIssuesFiltered.getResult().get(0).getPrimaryLocation().getFilePath());
+    assertEquals(expected1stPath, mappedIssuesFiltered.getResult().get(0).getPrimaryLocation().getFilePath());
   }
 
   @Test
@@ -199,7 +199,7 @@ class SonarIssueMapperTest {
     assertEquals(6, textRange.getEndColumn());
 
     assertNull(testee.mapPrimaryLocation(Result.builder().locations(null).build()));
-    assertNull(testee.mapPrimaryLocation(Result.builder().locations(Collections.EMPTY_LIST).build()));
+    assertNull(testee.mapPrimaryLocation(Result.builder().locations(Collections.emptyList()).build()));
   }
 
   @Test

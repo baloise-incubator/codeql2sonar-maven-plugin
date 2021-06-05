@@ -70,7 +70,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        mvn -B install -Dmaven.test.skip=true
+        mvn -B install
         mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java-builtin.sarif -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
 
     - name: update Sonar with findings
