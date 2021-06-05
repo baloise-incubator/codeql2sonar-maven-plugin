@@ -1,6 +1,11 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
 
+  <organization>
+    <name>Baloise Group</name>
+    <url>https://www.baloise.com</url>
+  </organization>
+
   <groupId>com.baloise.open</groupId>
   <artifactId>codeql2sonar-maven-plugin</artifactId>
   <version>0.1.1-SNAPSHOT</version>
@@ -16,6 +21,11 @@
       <email>arno.burkhart@baloise.ch</email>
     </developer>
   </developers>
+
+  <ciManagement>
+    <system>Github Actions</system>
+    <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin/actions</url>
+  </ciManagement>
 
   <scm>
     <connection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</connection>
@@ -36,6 +46,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.scm.id>github</project.scm.id>
 
     <sonar.projectKey>baloise-incubator_codeql2sonar-maven-plugin</sonar.projectKey>
     <sonar.organization>baloise-incubator</sonar.organization>

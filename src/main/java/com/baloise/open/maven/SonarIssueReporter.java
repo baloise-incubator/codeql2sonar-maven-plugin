@@ -99,7 +99,6 @@ public class SonarIssueReporter extends AbstractMojo {
 
     sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
       //process each mapped issue
-
       final String filePath = issue.getPrimaryLocation().getFilePath();
       srcDirPom.stream()
           // if filepath contains dir but does not start with it, it seems to be prefixed by module name
