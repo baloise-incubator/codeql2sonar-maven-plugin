@@ -4,6 +4,7 @@ import com.baloise.open.maven.codeql.sarif.dto.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +34,22 @@ class SarifParserTest {
 
   @Captor
   ArgumentCaptor<Result> resultCaptor;
+
+  @Test
+  void execute_EmptyFile_CallbackNotInvoked() throws URISyntaxException, FileNotFoundException {
+    final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
+    final File exampleSarifFile = new File(ClassLoader.getSystemResource("emptyFile.sarif").toURI());
+
+    SarifParser.execute(exampleSarifFile, mockedParserCB);
+
+    assertAll(
+        () -> Mockito.verify(mockedParserCB, Mockito.never()).onFinding(ArgumentMatchers.any(Result.class)),
+        () -> Mockito.verify(mockedParserCB, Mockito.never()).onVersion(ArgumentMatchers.anyString()),
+        () -> Mockito.verify(mockedParserCB, Mockito.never()).onSchema(ArgumentMatchers.anyString()),
+        () -> Mockito.verify(mockedParserCB, Mockito.never()).onDriver(ArgumentMatchers.any(Driver.class)),
+        () -> Mockito.verify(mockedParserCB, Mockito.never()).onRule(ArgumentMatchers.any(Rule.class))
+    );
+  }
 
   @Test
   void execute_testFile_HappyCase() throws URISyntaxException, FileNotFoundException {

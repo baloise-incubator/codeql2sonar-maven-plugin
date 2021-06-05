@@ -149,7 +149,7 @@ public class SarifParser {
       if (defaultConfig.has(ELEMENT_LEVEL)) {
         final String levelAsString = getObjectAsStringIfExists(defaultConfig, ELEMENT_LEVEL);
         try {
-          return Rule.Level.valueOf(levelAsString.toUpperCase(Locale.ROOT));
+          return levelAsString == null ? null : Rule.Level.valueOf(levelAsString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
           LOGGER.warning(String.format("Failed to interpret %s as Rule.Level: %s", levelAsString, e.getMessage()));
         }

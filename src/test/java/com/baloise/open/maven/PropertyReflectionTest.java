@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PropertyReflectionTest {
+public abstract class PropertyReflectionTest {
 
   protected void assertNumberOfProperties(Class<?> className, long expectedCount) {
     final Field[] declaredFields = className.getDeclaredFields();
