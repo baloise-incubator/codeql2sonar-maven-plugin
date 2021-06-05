@@ -29,9 +29,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import javax.inject.Inject;
 import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Mojo(name = "SonarIssueReporter", defaultPhase = LifecyclePhase.VERIFY)
 public class SonarIssueReporter extends AbstractMojo {
@@ -92,16 +95,39 @@ public class SonarIssueReporter extends AbstractMojo {
    * remove module prefix in filePath in case of multiModuleBuild
    */
   private void correctPathes(SonarIssueMapper sonarIssueMapper) {
-    //TODO: read from pom.xml if set to detect deviations from convention, i.e. <sourceDirectory>src/main/java</sourceDirectory>
-    final String srcDirStart = "src/";
-    final String srcDirStartPrefixed = "/" + srcDirStart;
+    final List<String> srcDirPom = getSourceDirectoryFromPom();
 
     sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
+      //process each mapped issue
+
       final String filePath = issue.getPrimaryLocation().getFilePath();
-      if (!filePath.startsWith(srcDirStart) && filePath.contains(srcDirStartPrefixed)) {
-        issue.getPrimaryLocation().setFilePath(filePath.substring(filePath.indexOf(srcDirStartPrefixed) + 1));
-      }
+      srcDirPom.stream()
+          // if filepath contains dir but does not start with it, it seems to be prefixed by module name
+          .filter(srcDirFilter -> !filePath.startsWith(srcDirFilter) && filePath.contains(srcDirFilter)).findFirst()
+          .ifPresent(path2Fix -> {
+            // remove module name
+            issue.getPrimaryLocation().setFilePath(filePath.substring(filePath.indexOf("/" + path2Fix) + 1));
+          });
     });
+  }
+
+  private List<String> getSourceDirectoryFromPom() {
+    final List<String> defaults = Collections.singletonList("src/");
+
+    if (getPluginContext() == null) {
+      return defaults;
+    }
+
+    final MavenProject project = (MavenProject) getPluginContext().get("project");
+    final List<String> compileSourceRoots = project.getCompileSourceRoots();
+    if (compileSourceRoots == null || compileSourceRoots.isEmpty()) {
+      return defaults;
+    }
+
+    final String absolutePath = project.getBasedir().getAbsolutePath();
+    return compileSourceRoots.stream()
+               .map(s -> s.replace(absolutePath, "").trim())
+               .collect(Collectors.toList());
   }
 
   private Writer getWriter() throws IOException {
@@ -111,7 +137,7 @@ public class SonarIssueReporter extends AbstractMojo {
   private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
     getLog().info("writing target " + target);
     new GsonBuilder().setPrettyPrinting().create()
-            .toJson(sonarIssueMapper.getMappedIssues(getPatternsToExclude()), writer);
+        .toJson(sonarIssueMapper.getMappedIssues(getPatternsToExclude()), writer);
     writer.flush();
   }
 
@@ -145,8 +171,8 @@ public class SonarIssueReporter extends AbstractMojo {
       final JsonObject rootObject = JsonParser.parseReader(new FileReader(sarifInputFile)).getAsJsonObject();
       if (!rootObject.has("$schema")) {
         throw new MojoExecutionException(sarifFile
-                , "$schema not found in root object."
-                , String.format("$schema not found in root object - provided file %s does not seem to be a valid sarif file", sarifFile.getName()));
+            , "$schema not found in root object."
+            , String.format("$schema not found in root object - provided file %s does not seem to be a valid sarif file", sarifFile.getName()));
       }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);
