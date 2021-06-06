@@ -142,7 +142,10 @@ public class SonarIssueReporter extends AbstractMojo {
   }
 
   private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
-    final Issues mappedIssues = sonarIssueMapper.getMappedIssues(getPatternsToExclude());
+    final String[] patternsToExclude = getPatternsToExclude();
+    getLog().debug("patterns to exclude: " + Arrays.toString(patternsToExclude));
+
+    final Issues mappedIssues = sonarIssueMapper.getMappedIssues(patternsToExclude);
     getLog().info(String.format("Writing target '%s' containing %d issues.", target, mappedIssues.getResult().size()));
 
     new GsonBuilder().setPrettyPrinting().create().toJson(mappedIssues, writer);

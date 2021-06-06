@@ -43,5 +43,5 @@ Run to execute ```mvn codeql2sonar:SonarIssueReporter```
   ```
   When using on command line with __-Dcodeql2sonar.sarif.path.exclude=__ the paths can be separated by comma, e.g.
   ```
-  -Dcodeql2sonar.sarif.path.exclude=path/subdir1,path/subdir2/
+  -Dcodeql2sonar.sarif.path.excludes=path/subdir1,path/subdir2/
   ```
