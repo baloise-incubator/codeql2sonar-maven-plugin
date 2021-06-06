@@ -102,6 +102,7 @@ public class SonarIssueReporter extends AbstractMojo {
       //process each mapped issue
       final String filePath = issue.getPrimaryLocation().getFilePath();
       srcDirPom.stream()
+          .map(s -> s.split("/")[0] + "/") // consider only first folder (e.g., src/) in order to capture generated folders also
           // if filepath contains dir but does not start with it, it seems to be prefixed by module name
           .filter(srcDirFilter -> !filePath.startsWith(srcDirFilter) && filePath.contains(srcDirFilter)).findFirst()
           .ifPresent(path2Fix -> {
@@ -121,14 +122,18 @@ public class SonarIssueReporter extends AbstractMojo {
     }
 
     final MavenProject project = (MavenProject) getPluginContext().get("project");
-    final List<String> compileSourceRoots = project.getCompileSourceRoots();
-    if (compileSourceRoots == null || compileSourceRoots.isEmpty()) {
+    final List<String> sourceRoots = new ArrayList<>();
+    sourceRoots.addAll(project.getCompileSourceRoots());
+    sourceRoots.addAll(project.getTestCompileSourceRoots());
+
+    if (sourceRoots.isEmpty()) {
       return defaults;
     }
 
-    final String absolutePath = project.getBasedir().getAbsolutePath();
-    return compileSourceRoots.stream()
+    final String absolutePath = project.getBasedir().getAbsolutePath() + File.separator;
+    return sourceRoots.stream()
                .map(s -> s.replace(absolutePath, "").trim())
+               .map(s -> s.replace("\\", "/"))
                .collect(Collectors.toList());
   }
 
