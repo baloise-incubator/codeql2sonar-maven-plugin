@@ -30,26 +30,26 @@ public class ConsoleParser implements ParserCallback {
 
   @Override
   public void onFinding(Result result) {
-    logger.info(result.toString());
+    logger.debug(result.toString());
   }
 
   @Override
   public void onVersion(String version) {
-    logger.info("Sarif version: " + version);
+    logger.debug("Sarif version: " + version);
   }
 
   @Override
   public void onSchema(String schema) {
-    logger.info("Sarif schema: " + schema);
+    logger.debug("Sarif schema: " + schema);
   }
 
   @Override
   public void onDriver(Driver driver) {
-    logger.info("Driver: " + driver);
+    logger.debug("Driver: " + driver);
   }
 
   @Override
   public void onRule(Rule rule) {
-    logger.info(String.format("Processed rule[%s]: %s", rule.getId(), rule.getName() ));
+    logger.debug(String.format("Processed rule[%s]: %s", rule.getId(), rule.getName() ));
   }
 }

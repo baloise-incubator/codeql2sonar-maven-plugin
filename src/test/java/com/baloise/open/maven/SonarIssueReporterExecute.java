@@ -17,7 +17,7 @@ public class SonarIssueReporterExecute {
 
   static Logger LOGGER = Logger.getLogger(SonarIssueReporterExecute.class.getName());
 
-  static String debug_path = "C:\\dev\\repos\\arburk\\codeql2sonar-maven-plugin\\src\\test\\resources\\debug\\";
+  static String debug_path = "C:\\dev\\gitRepos\\_github\\codeql2sonar-maven-plugin\\";
 
   public static void main(String[] args) throws IOException, URISyntaxException {
     final SonarIssueMapper sonarIssueMapper = new SonarIssueMapper();
@@ -25,16 +25,18 @@ public class SonarIssueReporterExecute {
     final URL systemResource = ClassLoader.getSystemResource("example.sarif");
     final File sarifInputFile = new File(systemResource.toURI());
     */
-    final File sarifInputFile = new File(debug_path + "java-builtin.sarif");
+    final File sarifInputFile = new File(debug_path + "java-analysis.sarif");
 
     SarifParser.execute(sarifInputFile, logParser, sonarIssueMapper);
     LOGGER.info(sonarIssueMapper.getSummary());
     final StringWriter stringWriter = new StringWriter();
     final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+    new SonarIssueReporter().correctPathes(sonarIssueMapper);
+
     gson.toJson(sonarIssueMapper.getMappedIssues(null), stringWriter);
     LOGGER.info(stringWriter.toString());
-    try (final FileWriter writer = new FileWriter(debug_path + "test.json")) {
+    try (final FileWriter writer = new FileWriter(debug_path + "result.json")) {
       gson.toJson(sonarIssueMapper.getMappedIssues(new String[]{"/test/"}), writer);
       writer.flush();
     }

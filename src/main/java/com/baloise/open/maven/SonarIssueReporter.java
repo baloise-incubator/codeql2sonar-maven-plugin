@@ -18,6 +18,7 @@ package com.baloise.open.maven;
 import com.baloise.open.maven.codeql.sarif.ConsoleParser;
 import com.baloise.open.maven.codeql.sarif.SarifParser;
 import com.baloise.open.maven.sonar.SonarIssueMapper;
+import com.baloise.open.maven.sonar.dto.Issues;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -94,7 +95,7 @@ public class SonarIssueReporter extends AbstractMojo {
   /**
    * remove module prefix in filePath in case of multiModuleBuild
    */
-  private void correctPathes(SonarIssueMapper sonarIssueMapper) {
+  void correctPathes(SonarIssueMapper sonarIssueMapper) {
     final List<String> srcDirPom = getSourceDirectoryFromPom();
 
     sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
@@ -105,7 +106,9 @@ public class SonarIssueReporter extends AbstractMojo {
           .filter(srcDirFilter -> !filePath.startsWith(srcDirFilter) && filePath.contains(srcDirFilter)).findFirst()
           .ifPresent(path2Fix -> {
             // remove module name
-            issue.getPrimaryLocation().setFilePath(filePath.substring(filePath.indexOf("/" + path2Fix) + 1));
+            final String replacedPath = filePath.substring(filePath.indexOf("/" + path2Fix) + 1);
+            getLog().debug(String.format("Replace '%s' with '%s'", filePath, replacedPath));
+            issue.getPrimaryLocation().setFilePath(replacedPath);
           });
     });
   }
@@ -134,9 +137,10 @@ public class SonarIssueReporter extends AbstractMojo {
   }
 
   private void writeResult(SonarIssueMapper sonarIssueMapper, Writer writer) throws IOException {
-    getLog().info("writing target " + target);
-    new GsonBuilder().setPrettyPrinting().create()
-        .toJson(sonarIssueMapper.getMappedIssues(getPatternsToExclude()), writer);
+    final Issues mappedIssues = sonarIssueMapper.getMappedIssues(getPatternsToExclude());
+    getLog().info(String.format("Writing target '%s' containing %d issues.", target, mappedIssues.getResult().size()));
+
+    new GsonBuilder().setPrettyPrinting().create().toJson(mappedIssues, writer);
     writer.flush();
   }
 
