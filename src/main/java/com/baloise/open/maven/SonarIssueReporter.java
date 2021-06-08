@@ -88,7 +88,12 @@ public class SonarIssueReporter extends AbstractMojo {
         writeResult(sonarIssueMapper, resultWriter);
       }
     } catch (Exception e) {
-      throw new MojoExecutionException(e.getMessage());
+      final StackTraceElement[] stackTrace = e.getStackTrace();
+      final String errMsg = (stackTrace != null && stackTrace.length>0)
+                                ? e.getMessage() + System.lineSeparator() + stackTrace[0].toString()
+                                : e.getMessage();
+      getLog().debug(e);
+      throw new MojoExecutionException(errMsg);
     }
   }
 
