@@ -21,14 +21,9 @@ jobs:
         env:
           GITHUB_USERNAME: x-access-token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --settings .github/maven-settings.xml deploy
+        run: mvn -B --settings .github/maven-settings.xml deploy
         
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Release using Github CLI
+        run: gh release create ${GITHUB_REF##*/} ./target/*.jar -t "Release ${GITHUB_REF##*/}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: baloise-incubator/codeql2sonar-maven-plugin
-        with:
-          name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
