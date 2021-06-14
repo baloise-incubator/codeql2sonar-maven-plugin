@@ -28,7 +28,7 @@ class SonarIssueReporterTest {
 
     final SonarIssueReporter testee = new SonarIssueReporter(input.getAbsolutePath());
     final MojoExecutionException mojoExecutionException = assertThrows(MojoExecutionException.class, testee::execute);
-    assertEquals("$schema not found in root object.", mojoExecutionException.getMessage());
+    assertTrue(mojoExecutionException.getMessage().startsWith("$schema not found in root object."));
   }
 
 

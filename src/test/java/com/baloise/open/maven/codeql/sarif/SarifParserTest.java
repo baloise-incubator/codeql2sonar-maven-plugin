@@ -1,6 +1,7 @@
 package com.baloise.open.maven.codeql.sarif;
 
 import com.baloise.open.maven.codeql.sarif.dto.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +37,7 @@ class SarifParserTest {
   ArgumentCaptor<Result> resultCaptor;
 
   @Test
+  @DisplayName("Empty SARIF file does not invoke any callback function")
   void execute_EmptyFile_CallbackNotInvoked() throws URISyntaxException, FileNotFoundException {
     final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
     final File exampleSarifFile = new File(ClassLoader.getSystemResource("emptyFile.sarif").toURI());
@@ -43,15 +45,16 @@ class SarifParserTest {
     SarifParser.execute(exampleSarifFile, mockedParserCB);
 
     assertAll(
-        () -> Mockito.verify(mockedParserCB, Mockito.never()).onFinding(ArgumentMatchers.any(Result.class)),
-        () -> Mockito.verify(mockedParserCB, Mockito.never()).onVersion(ArgumentMatchers.anyString()),
-        () -> Mockito.verify(mockedParserCB, Mockito.never()).onSchema(ArgumentMatchers.anyString()),
-        () -> Mockito.verify(mockedParserCB, Mockito.never()).onDriver(ArgumentMatchers.any(Driver.class)),
-        () -> Mockito.verify(mockedParserCB, Mockito.never()).onRule(ArgumentMatchers.any(Rule.class))
+            () -> Mockito.verify(mockedParserCB, Mockito.never()).onFinding(ArgumentMatchers.any(Result.class)),
+            () -> Mockito.verify(mockedParserCB, Mockito.never()).onVersion(ArgumentMatchers.anyString()),
+            () -> Mockito.verify(mockedParserCB, Mockito.never()).onSchema(ArgumentMatchers.anyString()),
+            () -> Mockito.verify(mockedParserCB, Mockito.never()).onDriver(ArgumentMatchers.any(Driver.class)),
+            () -> Mockito.verify(mockedParserCB, Mockito.never()).onRule(ArgumentMatchers.any(Rule.class))
     );
   }
 
   @Test
+  @DisplayName("Happy Case parse example.sarif")
   void execute_testFile_HappyCase() throws URISyntaxException, FileNotFoundException {
     final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
     final File exampleSarifFile = new File(ClassLoader.getSystemResource("example.sarif").toURI());
@@ -65,7 +68,7 @@ class SarifParserTest {
     assertEquals("https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", schemaCaptor.getValue());
 
     Mockito.verify(mockedParserCB, Mockito.times(1)).onDriver(driverCaptor.capture());
-    verifyDriver(driverCaptor.getValue());
+    verifyDriver(driverCaptor.getValue(), "2.3.3");
 
     Mockito.verify(mockedParserCB, Mockito.times(10)).onRule(ruleCaptor.capture());
     final List<Rule> rulesCaptured = ruleCaptor.getAllValues();
@@ -139,15 +142,75 @@ class SarifParserTest {
     assertEquals(1, Arrays.stream(esbTags).filter("external/cwe/cwe-585"::equals).count());
   }
 
-  private void verifyDriver(Driver driverCaptured) {
+  private void verifyDriver(Driver driverCaptured, String versionExpected) {
     assertEquals("GitHub", driverCaptured.getOrganization());
     assertEquals("CodeQL", driverCaptured.getName());
-    assertEquals("2.3.3", driverCaptured.getSemanticVersion());
+    assertEquals(versionExpected, driverCaptured.getSemanticVersion());
   }
 
   @Test
+  @DisplayName("Check FileNotFoundException on inexistent input file")
   void execute_wrongFile_FNFException() {
     assertThrows(FileNotFoundException.class, () -> SarifParser.execute(new File(""), (ParserCallback) null));
   }
 
+  @Test
+  @DisplayName("Verify extension rules are properly parsed using rulesInExtensions.sarif")
+  void execute_rulesInExtensionsTest() throws URISyntaxException, FileNotFoundException {
+    final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
+    final File exampleSarifFile = new File(ClassLoader.getSystemResource("rulesInExtensions.sarif").toURI());
+
+    SarifParser.execute(exampleSarifFile, mockedParserCB);
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onVersion(versionCaptor.capture());
+    assertEquals("2.1.0", versionCaptor.getValue());
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onSchema(schemaCaptor.capture());
+    assertEquals("https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", schemaCaptor.getValue());
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onDriver(driverCaptor.capture());
+    verifyDriver(driverCaptor.getValue(), "2.5.5");
+
+    Mockito.verify(mockedParserCB, Mockito.times(166)).onRule(ruleCaptor.capture());
+    final List<Rule> rulesCaptured = ruleCaptor.getAllValues();
+
+    assertEquals(166, rulesCaptured.size());
+
+    final Rule sqlInjection = rulesCaptured.get(0);
+    assertEquals("java/sql-injection", sqlInjection.getId());
+    assertEquals("java/sql-injection", sqlInjection.getName());
+    assertEquals("Query built from user-controlled sources", sqlInjection.getShortDescription());
+    assertEquals("Building a SQL or Java Persistence query from user-controlled sources is vulnerable to insertion of malicious code by the user.", sqlInjection.getFullDescription());
+    assertEquals(Rule.Level.ERROR, sqlInjection.getLevel());
+    assertNotNull(sqlInjection.getProperties());
+    final RuleProperties ruleProperties = sqlInjection.getProperties();
+    assertEquals("java/sql-injection", ruleProperties.getId());
+    assertEquals("Query built from user-controlled sources", ruleProperties.getName());
+    assertEquals("Building a SQL or Java Persistence query from user-controlled sources is vulnerable to insertion of\n              malicious code by the user.", ruleProperties.getDescription());
+    assertEquals("high", ruleProperties.getPrecision());
+    assertEquals("path-problem", ruleProperties.getKind());
+    assertEquals(RuleProperties.Severity.error, ruleProperties.getSeverity());
+    final String[] esbTags = ruleProperties.getTags();
+    assertEquals(3, esbTags.length);
+    assertEquals(1, Arrays.stream(esbTags).filter("security"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("external/cwe/cwe-089"::equals).count());
+    assertEquals(1, Arrays.stream(esbTags).filter("external/cwe/cwe-564"::equals).count());
+
+    Mockito.verify(mockedParserCB, Mockito.times(1)).onFinding(resultCaptor.capture());
+    final Result result = resultCaptor.getValue();
+    assertEquals("java/input-resource-leak", result.getRuleId());
+    assertEquals(64, result.getRuleIndex());
+    assertEquals("This FileReader is not always closed on method exit.", result.getMessage());
+    assertNotNull(result.getLocations());
+    assertEquals(1, result.getLocations().size());
+    final Location location = result.getLocations().get(0);
+    assertEquals("src/main/java/com/baloise/open/maven/codeql/sarif/SarifParser.java", location.getUri());
+    assertEquals("%SRCROOT%", location.getUriBaseId());
+    assertEquals(0, location.getIndex());
+    assertNotNull(location.getRegion());
+    final Region region = location.getRegion();
+    assertEquals(84, region.getStartLine());
+    assertEquals(58, region.getStartColumn());
+    assertEquals(88, region.getEndColumn());
+  }
 }

@@ -40,6 +40,7 @@ public class SarifParser {
   static final String ELEMENT_FULL_DESCRIPTION = "fullDescription";
   static final String ELEMENT_ID = "id";
   static final String ELEMENT_INDEX = "index";
+  static final String ELEMENT_EXTENSIONS = "extensions";
   static final String ELEMENT_KIND = "kind";
   static final String ELEMENT_LEVEL = "level";
   static final String ELEMENT_LOCATIONS = "locations";
@@ -53,6 +54,7 @@ public class SarifParser {
   static final String ELEMENT_REGION = "region";
   static final String ELEMENT_RESULTS = "results";
   static final String ELEMENT_RULES = "rules";
+  static final String ELEMENT_RULE = "rule";
   static final String ELEMENT_RULE_ID = "ruleId";
   static final String ELEMENT_RULE_INDEX = "ruleIndex";
   static final String ELEMENT_RUNS = "runs";
@@ -115,21 +117,35 @@ public class SarifParser {
         Arrays.stream(callback).forEach(cb -> cb.onDriver(driverDto));
 
         if (driver != null && driver.has(ELEMENT_RULES)) {
-          driver.get(ELEMENT_RULES).getAsJsonArray().forEach(rule -> {
-            final JsonObject jsonObjectRule = rule.getAsJsonObject();
-            final Rule ruleDto = Rule.builder()
-                    .id(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_ID))
-                    .name(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_NAME))
-                    .shortDescription(getTextElement(jsonObjectRule, ELEMENT_SHORT_DESCRIPTION))
-                    .fullDescription(getTextElement(jsonObjectRule, ELEMENT_FULL_DESCRIPTION))
-                    .level(parseDefaultConfigLevel(jsonObjectRule))
-                    .properties(parseRuleProperties(jsonObjectRule))
-                    .build();
-            Arrays.stream(callback).forEach(cb -> cb.onRule(ruleDto));
-          });
+          processRules(driver.get(ELEMENT_RULES).getAsJsonArray(), callback);
         }
       }
+
+      if (toolObject.has(ELEMENT_EXTENSIONS)) {
+        final JsonArray extensions = toolObject.get(ELEMENT_EXTENSIONS).getAsJsonArray();
+        extensions.forEach(extension -> {
+          final JsonObject ext = extension.getAsJsonObject();
+          if (ext.has(ELEMENT_RULES)) {
+            processRules(ext.get(ELEMENT_RULES).getAsJsonArray(), callback);
+          }
+        });
+      }
     }
+  }
+
+  private static void processRules(JsonArray rulesArray, ParserCallback[] callback) {
+    rulesArray.forEach(rule -> {
+      final JsonObject jsonObjectRule = rule.getAsJsonObject();
+      final Rule ruleDto = Rule.builder()
+              .id(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_ID))
+              .name(getObjectAsStringIfExists(jsonObjectRule, ELEMENT_NAME))
+              .shortDescription(getTextElement(jsonObjectRule, ELEMENT_SHORT_DESCRIPTION))
+              .fullDescription(getTextElement(jsonObjectRule, ELEMENT_FULL_DESCRIPTION))
+              .level(parseDefaultConfigLevel(jsonObjectRule))
+              .properties(parseRuleProperties(jsonObjectRule))
+              .build();
+      Arrays.stream(callback).forEach(cb -> cb.onRule(ruleDto));
+    });
   }
 
   private static Driver parseDriver(JsonObject driver) {
@@ -174,8 +190,12 @@ public class SarifParser {
     return null;
   }
 
-  private static String getObjectAsStringIfExists(JsonObject properties, String elementId) {
-    return properties != null && properties.has(elementId) ? properties.get(elementId).getAsString() : null;
+  private static String getObjectAsStringIfExists(JsonObject jsonObject, String elementId) {
+    return jsonObject != null && jsonObject.has(elementId) ? jsonObject.get(elementId).getAsString() : null;
+  }
+
+  private static Integer getObjectAsIntegerIfExists(JsonObject jsonObject, String elementId) {
+    return jsonObject != null && jsonObject.has(elementId) ? jsonObject.get(elementId).getAsInt() : null;
   }
 
   private static RuleProperties.Severity parseProblemSeverity(JsonObject properties) {
@@ -204,10 +224,14 @@ public class SarifParser {
         final JsonObject resultJsonObject = result.getAsJsonObject();
         final Result resultDto = Result.builder()
                 .ruleId(getObjectAsStringIfExists(resultJsonObject, ELEMENT_RULE_ID))
-                .ruleIndex(resultJsonObject.get(ELEMENT_RULE_INDEX).getAsInt())
+                .ruleIndex(getObjectAsIntegerIfExists(resultJsonObject, ELEMENT_RULE_INDEX))
                 .message(getTextElement(resultJsonObject, ELEMENT_MESSAGE))
                 .locations(parseLocations(resultJsonObject))
                 .build();
+
+        if (resultDto.getRuleIndex() == null && resultJsonObject.has(ELEMENT_RULE)) {
+          resultDto.setRuleIndex(getObjectAsIntegerIfExists(resultJsonObject.getAsJsonObject(ELEMENT_RULE), ELEMENT_INDEX));
+        }
 
         Arrays.stream(callback).forEach(cb -> cb.onFinding(resultDto));
       });

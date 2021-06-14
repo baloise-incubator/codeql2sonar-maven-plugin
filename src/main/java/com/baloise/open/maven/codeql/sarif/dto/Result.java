@@ -27,7 +27,7 @@ import java.util.List;
 public class Result {
 
   private String ruleId;
-  private int ruleIndex;
+  private Integer ruleIndex;
   private String message;
   private List<Location> locations;
 
