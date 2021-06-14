@@ -24,6 +24,7 @@ import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -81,23 +82,25 @@ public class SarifParser {
    *
    * @throws FileNotFoundException when sarifInputFile is not present
    */
-  public static void execute(File sarifInputFile, ParserCallback... callback) throws FileNotFoundException {
+  public static void execute(File sarifInputFile, ParserCallback... callback) throws IOException {
 
-    final JsonObject rootObject = JsonParser.parseReader(new FileReader(sarifInputFile)).getAsJsonObject();
+    try (final FileReader reader = new FileReader(sarifInputFile)) {
+      final JsonObject rootObject = JsonParser.parseReader(reader).getAsJsonObject();
 
-    if (rootObject.has(ELEMENT_VERSION)) {
-      final String version = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_VERSION);
-      Arrays.stream(callback).forEach(cb -> cb.onVersion(version));
-    }
+      if (rootObject.has(ELEMENT_VERSION)) {
+        final String version = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_VERSION);
+        Arrays.stream(callback).forEach(cb -> cb.onVersion(version));
+      }
 
-    if (rootObject.has(ELEMENT_SCHEMA)) {
-      final String schema = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_SCHEMA);
-      Arrays.stream(callback).forEach(cb -> cb.onSchema(schema));
-    }
+      if (rootObject.has(ELEMENT_SCHEMA)) {
+        final String schema = getObjectAsStringIfExists(rootObject, SarifParser.ELEMENT_SCHEMA);
+        Arrays.stream(callback).forEach(cb -> cb.onSchema(schema));
+      }
 
-    if (rootObject.has(ELEMENT_RUNS)) {
-      for (JsonElement singleRun : rootObject.get(ELEMENT_RUNS).getAsJsonArray()) {
-        parseRun(singleRun.getAsJsonObject(), callback);
+      if (rootObject.has(ELEMENT_RUNS)) {
+        for (JsonElement singleRun : rootObject.get(ELEMENT_RUNS).getAsJsonArray()) {
+          parseRun(singleRun.getAsJsonObject(), callback);
+        }
       }
     }
   }

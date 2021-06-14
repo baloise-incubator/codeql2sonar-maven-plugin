@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +39,7 @@ class SarifParserTest {
 
   @Test
   @DisplayName("Empty SARIF file does not invoke any callback function")
-  void execute_EmptyFile_CallbackNotInvoked() throws URISyntaxException, FileNotFoundException {
+  void execute_EmptyFile_CallbackNotInvoked() throws URISyntaxException, IOException {
     final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
     final File exampleSarifFile = new File(ClassLoader.getSystemResource("emptyFile.sarif").toURI());
 
@@ -55,7 +56,7 @@ class SarifParserTest {
 
   @Test
   @DisplayName("Happy Case parse example.sarif")
-  void execute_testFile_HappyCase() throws URISyntaxException, FileNotFoundException {
+  void execute_testFile_HappyCase() throws URISyntaxException, IOException {
     final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
     final File exampleSarifFile = new File(ClassLoader.getSystemResource("example.sarif").toURI());
 
@@ -156,7 +157,7 @@ class SarifParserTest {
 
   @Test
   @DisplayName("Verify extension rules are properly parsed using rulesInExtensions.sarif")
-  void execute_rulesInExtensionsTest() throws URISyntaxException, FileNotFoundException {
+  void execute_rulesInExtensionsTest() throws URISyntaxException, IOException {
     final ParserCallback mockedParserCB = Mockito.mock(ParserCallback.class);
     final File exampleSarifFile = new File(ClassLoader.getSystemResource("rulesInExtensions.sarif").toURI());
 
