@@ -50,8 +50,8 @@ jobs:
     - name: Archive codeQl result
       uses: actions/upload-artifact@v2
       with:
-        name: codeQl result
-        path: /home/runner/work/codeql2sonar-maven-plugin/results/java-builtin.sarif
+        name: Code-QL result (sarif file)
+        path: /home/runner/work/codeql2sonar-maven-plugin/results/*.sarif
         retention-days: 10
 
     - name: convert codeQL results into sonar's generic issues format
@@ -59,12 +59,12 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         mvn -B install
-        mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java-builtin.sarif -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
+        mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java.sarif -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
 
     - name: Archive conversion result
       uses: actions/upload-artifact@v2
       with:
-        name: conversion result
+        name: conversion result (json file)
         path: /home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
         retention-days: 10
 
@@ -73,12 +73,3 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.externalIssuesReportPaths=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
-
-    - name: Archive sarif files
-      uses: actions/upload-artifact@v2
-      with:
-        name: Result files (codeQl and converted sonar issues)
-        path: |
-          /home/runner/work/codeql2sonar-maven-plugin/results/java-builtin.sarif
-          /home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
-        retention-days: 10
