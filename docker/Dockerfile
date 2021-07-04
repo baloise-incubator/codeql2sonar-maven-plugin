@@ -1,25 +1,45 @@
-FROM openjdk:12
+FROM ubuntu:20.04
 LABEL Description="prepare a docker image for executing codeql analysis on a repo"
 
-RUN yum install git wget unzip maven -y
-
-RUN echo 'create /workdir to be used'
 RUN mkdir /workdir
 RUN mkdir /workdir/project2scan
 WORKDIR /workdir
 
-RUN echo 'download and unzip codeql cli v.2.5.5'
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.5.5/codeql-linux64.zip
-RUN unzip codeql-linux64.zip
-RUN rm codeql-linux64.zip
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    git \
+    less \
+    wget \
+    unzip
 
-RUN echo 'clone query defintions from https://github.com/github/codeql.git'
-RUN git clone --depth=1 https://github.com/github/codeql.git codeql-repo
+#SETUP Maven
+ENV MAVEN_VERSION 3.8.1
+ENV MAVEN_HOME /usr/lib/mvn
+ENV PATH $MAVEN_HOME/bin:$PATH
 
-# Setup maven
-RUN wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-RUN yum install -y apache-maven
+RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz --no-check-certificate && \
+  tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
 
-ADD execute.sh ./execute.sh
+#SETUP codeql cli v.2.5.5
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.5.5/codeql-linux64.zip --no-check-certificate && \
+  unzip codeql-linux64.zip && \
+  rm codeql-linux64.zip
 
-ENTRYPOINT ["/workdir/execute.sh"]
+#CONFIGURE Java provided by CodeQL
+ENV JAVA_HOME /workdir/codeql/tools/linux64/java
+ENV PATH $JAVA_HOME/bin:$PATH
+ENV CODEQL_JAVA_HOME $JAVA_HOME
+
+#RUN echo 'clone query defintions from https://github.com/github/codeql.git'
+RUN git config --system http.sslVerify false && \
+  git clone --depth=1 https://github.com/github/codeql.git codeql-repo
+
+#PRECOMPILE java-security-and-quality queries
+RUN codeql/codeql query compile codeql-repo/java/ql/src/codeql-suites/java-security-and-quality.qls
+
+ADD execute.sh /workdir/execute.sh
+CMD ["./execute.sh"]
+#ENTRYPOINT ["./execute.sh"]
