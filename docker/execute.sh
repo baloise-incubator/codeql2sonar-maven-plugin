@@ -2,7 +2,7 @@
 cd /workdir/project2scan
 echo "cleanup before start"
 rm -rf database
-mvn clean
+mvn -B clean
 cd ..
 
 codeql/codeql database create project2scan/database --language=java

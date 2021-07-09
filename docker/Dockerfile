@@ -21,10 +21,10 @@ ENV PATH $MAVEN_HOME/bin:$PATH
 RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz --no-check-certificate && \
   tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
-  mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
+  mv apache-maven-$MAVEN_VERSION $MAVEN_HOME
 
-#SETUP codeql cli v.2.5.5
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.5.5/codeql-linux64.zip --no-check-certificate && \
+#SETUP codeql cli v.2.5.7
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.5.7/codeql-linux64.zip --no-check-certificate && \
   unzip codeql-linux64.zip && \
   rm codeql-linux64.zip
 
@@ -42,4 +42,3 @@ RUN codeql/codeql query compile codeql-repo/java/ql/src/codeql-suites/java-secur
 
 ADD execute.sh /workdir/execute.sh
 CMD ["./execute.sh"]
-#ENTRYPOINT ["./execute.sh"]
