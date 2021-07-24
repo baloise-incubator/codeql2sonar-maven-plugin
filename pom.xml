@@ -133,6 +133,21 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>3.8.1</version>
+      <exclusions>
+        <!--
+        (CVSS 3.3) [CVE-2020-8908] A temp directory creation vulnerability exist in Guava versions prior to 30.0
+        Therefore exclude vulnerable dependency here and add "save" one below
+        -->
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>30.1.1-android</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
