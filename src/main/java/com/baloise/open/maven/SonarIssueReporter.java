@@ -101,7 +101,7 @@ public class SonarIssueReporter extends AbstractMojo {
    * remove module prefix in filePath in case of multiModuleBuild
    */
   void correctPathes(SonarIssueMapper sonarIssueMapper) {
-    final List<String> srcDirPom = getSourceDirectoryFromPom();
+    final List<String> srcDirPom = getSourceDirectoryFromPom(getPluginContext());
 
     sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
       //process each mapped issue
@@ -119,14 +119,14 @@ public class SonarIssueReporter extends AbstractMojo {
     });
   }
 
-  private List<String> getSourceDirectoryFromPom() {
+  List<String> getSourceDirectoryFromPom(final Map pluginContext) {
     final List<String> defaults = Collections.singletonList("src/");
 
-    if (getPluginContext() == null) {
+    if (pluginContext == null) {
       return defaults;
     }
 
-    final MavenProject project = (MavenProject) getPluginContext().get("project");
+    final MavenProject project = (MavenProject) pluginContext.get("project");
     final List<String> sourceRoots = new ArrayList<>();
     sourceRoots.addAll(project.getCompileSourceRoots());
     sourceRoots.addAll(project.getTestCompileSourceRoots());

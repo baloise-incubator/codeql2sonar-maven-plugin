@@ -89,7 +89,6 @@ public class SonarIssueMapper implements ParserCallback {
     return Issue.Severity.INFO;
   }
 
-  // TODO: verify if mapping is as expected
   Issue.Severity mapRuleToIssueSeverity(final Rule.Level level, final RuleProperties properties) {
     if (properties == null || properties.getSeverity() == null) {
       // without properties the only basis to map severity is the rule level.
@@ -163,7 +162,6 @@ public class SonarIssueMapper implements ParserCallback {
     }
   }
 
-  // TODO: verify if mapping is as expected
   Issue.Type mapType(Issue.Severity severity) {
     if (severity == null) {
       return null;

@@ -1,13 +1,19 @@
-package com.baloise.open.maven.codeql;
+package com.baloise.open.maven;
 
-import com.baloise.open.maven.SonarIssueReporter;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,4 +67,58 @@ class SonarIssueReporterTest {
     final String expectedString = FileUtils.fileRead(expected).trim().replace("\n", "").replace("\r", "");
     assertEquals(expectedString, testwriter.toString().trim().replace("\n", "").replace("\r", ""));
   }
+
+  @Nested
+  class SrcDirectoryFromPom {
+
+    @Test
+    void emptyPluginContextDoesNotCrash() {
+      assertNotNull(new SonarIssueReporter().getSourceDirectoryFromPom(null));
+    }
+
+    @Test
+    void emptyCompiledSourcesResultsDefault() {
+      final MavenProject mockedMvnPrj = Mockito.mock(MavenProject.class);
+      Mockito.when(mockedMvnPrj.getCompileSourceRoots()).thenReturn(Collections.emptyList());
+      Mockito.when(mockedMvnPrj.getTestCompileSourceRoots()).thenReturn(Collections.emptyList());
+
+      Map<String, MavenProject> map = new HashMap<>();
+      map.put("project", mockedMvnPrj);
+
+      final List<String> result = new SonarIssueReporter().getSourceDirectoryFromPom(map);
+
+      assertAll(
+          () -> assertNotNull(result),
+          () -> assertFalse(result.isEmpty()),
+          () -> assertEquals(1, result.size()),
+          () -> assertTrue(result.contains("src/"))
+      );
+    }
+
+    @Test
+    void compiledSourcesConsidered() {
+      final MavenProject mockedMvnPrj = Mockito.mock(MavenProject.class);
+      Mockito.when(mockedMvnPrj.getCompileSourceRoots()).thenReturn(Collections.singletonList("/usr/test/project/mockedSrc/".replace("/", File.separator)));
+      Mockito.when(mockedMvnPrj.getTestCompileSourceRoots()).thenReturn(Collections.singletonList("/usr/test/project/mockedSrcTest/".replace("/", File.separator)));
+
+      final File mockedFile = Mockito.mock(File.class);
+      Mockito.when(mockedFile.getAbsolutePath()).thenReturn("/usr/test/project".replace("/", File.separator));
+      Mockito.when(mockedMvnPrj.getBasedir()).thenReturn(mockedFile);
+
+      Map<String, MavenProject> map = new HashMap<>();
+      map.put("project", mockedMvnPrj);
+
+      final List<String> result = new SonarIssueReporter().getSourceDirectoryFromPom(map);
+
+      assertAll(
+          () -> assertNotNull(result),
+          () -> assertFalse(result.isEmpty()),
+          () -> assertEquals(2, result.size()),
+          () -> assertTrue(result.contains("mockedSrc/")),
+          () -> assertTrue(result.contains("mockedSrcTest/"))
+      );
+    }
+
+  }
+
 }
