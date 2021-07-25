@@ -59,7 +59,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         mvn -B install
-        mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java.sarif -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
+        mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java.sarif -Dcodeql2sonar.sarif.ignoreTests=true -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
 
     - name: Archive conversion result
       uses: actions/upload-artifact@v2
