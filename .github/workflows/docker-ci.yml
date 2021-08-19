@@ -3,7 +3,7 @@ name: Docker CI
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
   schedule:
     - cron: '28 3 * * 0' #Sundays at 3:28 AM
 jobs:
