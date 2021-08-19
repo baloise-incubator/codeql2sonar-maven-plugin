@@ -24,6 +24,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: /docker/Dockerfile
+          file: ./docker/Dockerfile
           push: true
           tags: arburk/codeql-analyzer-java:latest
