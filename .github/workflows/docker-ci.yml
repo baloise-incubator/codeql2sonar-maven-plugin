@@ -2,8 +2,8 @@ name: Docker CI
 
 on:
   push:
-    branches:
-      - 'main'
+    paths:
+      - 'docker/*'
   schedule:
     - cron: '28 3 * * 0' #Sundays at 3:28 AM
     
