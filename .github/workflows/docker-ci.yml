@@ -6,6 +6,11 @@ on:
       - 'main'
   schedule:
     - cron: '28 3 * * 0' #Sundays at 3:28 AM
+    
+defaults:
+  run:
+    working-directory: ./  # docker/build-push-action@v2 is not applying a working-directory
+    
 jobs:
   docker:
     runs-on: ubuntu-latest
