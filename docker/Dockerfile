@@ -41,4 +41,5 @@ RUN git config --system http.sslVerify false && \
 RUN codeql/codeql query compile codeql-repo/java/ql/src/codeql-suites/java-security-and-quality.qls
 
 ADD execute.sh /workdir/execute.sh
+RUN chmod +x /workdir/execute.sh
 CMD ["./execute.sh"]
