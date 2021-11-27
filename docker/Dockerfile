@@ -14,7 +14,7 @@ RUN apt-get update && \
     unzip
 
 #SETUP Maven
-ENV MAVEN_VERSION 3.8.3
+ENV MAVEN_VERSION 3.8.4
 ENV MAVEN_HOME /usr/lib/mvn
 ENV PATH $MAVEN_HOME/bin:$PATH
 
@@ -23,8 +23,8 @@ RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apac
   rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   mv apache-maven-$MAVEN_VERSION $MAVEN_HOME
 
-#SETUP codeql cli v.2.6.3
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.6.3/codeql-linux64.zip --no-check-certificate && \
+#SETUP codeql cli v.2.7.2
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.7.2/codeql-linux64.zip --no-check-certificate && \
   unzip codeql-linux64.zip && \
   rm codeql-linux64.zip
 

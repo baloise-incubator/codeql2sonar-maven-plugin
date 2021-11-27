@@ -6,9 +6,10 @@ JAVA runtime provided by CodeQL CLI is used
 > OpenJDK Runtime Environment AdoptOpenJDK (build 11.0.10+9)  
 > OpenJDK 64-Bit Server VM AdoptOpenJDK (build 11.0.10+9, mixed mode)  
 
-Pull from DockerHub: ```docker pull arburk/codeql-analyzer-java```  
+Pull from [DockerHub](https://hub.docker.com/r/arburk/codeql-analyzer-java): 
+```docker pull arburk/codeql-analyzer-java```  
 or build image like following:
-```docker build . -t codeql-analyzer-java:2.6.3```
+```docker build . -t codeql-analyzer-java:2.7.2```
 
 The project to scan needs to be mounted into ___/workdir/project2scan/___ like following:
-```docker run -v c:/dev/repos/myJavaProject:/workdir/project2scan arburk/codeql-analyzer-java:2.6.3```
+```docker run -v c:/dev/repos/myJavaProject:/workdir/project2scan arburk/codeql-analyzer-java:2.7.2```
