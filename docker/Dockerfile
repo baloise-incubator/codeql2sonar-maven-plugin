@@ -6,25 +6,26 @@ RUN mkdir /workdir/project2scan
 WORKDIR /workdir
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
+    apt-get upgrade -y
+RUN apt-get install -y ca-certificates && update-ca-certificates
+RUN apt-get install -y --no-install-recommends \
     git \
     less \
     wget \
     unzip
 
 #SETUP Maven
-ENV MAVEN_VERSION 3.8.4
+ENV MAVEN_VERSION 3.8.5
 ENV MAVEN_HOME /usr/lib/mvn
 ENV PATH $MAVEN_HOME/bin:$PATH
 
-RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz --no-check-certificate && \
+RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   mv apache-maven-$MAVEN_VERSION $MAVEN_HOME
 
 #SETUP codeql cli v.2.8.1
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.8.1/codeql-linux64.zip --no-check-certificate && \
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.8.1/codeql-linux64.zip && \
   unzip codeql-linux64.zip && \
   rm codeql-linux64.zip
 
@@ -34,8 +35,7 @@ ENV PATH $JAVA_HOME/bin:$PATH
 ENV CODEQL_JAVA_HOME $JAVA_HOME
 
 #RUN echo 'clone query defintions from https://github.com/github/codeql.git'
-RUN git config --system http.sslVerify false && \
-  git clone --depth=1 https://github.com/github/codeql.git codeql-repo
+RUN git clone --depth=1 https://github.com/github/codeql.git codeql-repo
 
 #PRECOMPILE java-security-and-quality queries
 RUN codeql/codeql query compile codeql-repo/java/ql/src/codeql-suites/java-security-and-quality.qls
