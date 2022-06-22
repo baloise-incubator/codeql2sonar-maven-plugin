@@ -1,7 +1,8 @@
 name: Docker CI
-
+  
 on:
   push:
+    branches: [ main ]
     paths:
       - 'docker/*'
   schedule:
