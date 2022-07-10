@@ -11,5 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: configure git
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
       - name: Prepare release with Maven
         run: mvn -B release:prepare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
