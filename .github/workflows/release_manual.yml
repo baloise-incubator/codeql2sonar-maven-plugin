@@ -1,0 +1,54 @@
+name: Perform Release with deployment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      deployments: write
+
+    steps:
+      - name: Checkout selected branch (head expected)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for all tags and branches
+          tagsRefSpec: "+refs/tags/*:refs/tags/*" # Fetch all tags
+
+      - name: Configure git
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+
+      - name: Prepare release with Maven
+        run: mvn -B release:prepare
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read recent created tag
+        run: |
+          git pull --tags
+          echo read recent tag: $(git describe --tags --abbrev=0)
+          export TAG_REF=$(git describe --tags --abbrev=0)
+          echo put "tag_ref=$TAG_REF" to GITHUB_ENV
+          echo tag_ref=$TAG_REF >> $GITHUB_ENV
+
+      - name: Checkout tag ${{ env.tag_ref }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.tag_ref }}
+
+      - name: Deploy to Github Package Registry
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B --settings .github/maven-settings.xml clean deploy
+
+      - name: Release using Github CLI
+        run: gh release create ${env.tag_ref} ./target/*.jar -t "Release ${env.tag_ref}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
