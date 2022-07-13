@@ -8,7 +8,7 @@
 
   <groupId>com.baloise.open</groupId>
   <artifactId>codeql2sonar-maven-plugin</artifactId>
-  <version>0.1.5-SNAPSHOT</version>
+  <version>0.1.5</version>
   <packaging>maven-plugin</packaging>
 
   <name>Maven plugin converting SARIF files</name>
@@ -31,7 +31,7 @@
     <connection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</connection>
     <developerConnection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</developerConnection>
     <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>v0.1.5</tag>
   </scm>
 
   <distributionManagement>
