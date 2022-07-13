@@ -49,6 +49,6 @@ jobs:
         run: mvn -B --settings .github/maven-settings.xml clean deploy
 
       - name: Release using Github CLI
-        run: gh release create ${env.tag_ref} ./target/*.jar -t "Release ${env.tag_ref}"
+        run: gh release create ${{ env.tag_ref }} ./target/*.jar -t "Release ${{ env.tag_ref }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
