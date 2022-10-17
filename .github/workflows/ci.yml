@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@master # don't get confused by @master - it is the version of the checkout action. You repo will be checked out with ${{ github.ref }}
+        uses: actions/checkout@main # don't get confused by @master - it is the version of the checkout action. You repo will be checked out with ${{ github.ref }}
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
