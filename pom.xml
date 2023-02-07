@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <organization>
@@ -29,7 +30,8 @@
 
   <scm>
     <connection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</connection>
-    <developerConnection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git
+    </developerConnection>
     <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
     <tag>HEAD</tag>
   </scm>
@@ -53,7 +55,8 @@
     <sonar.organization>baloise-incubator</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.java.codeCoveragePlugin>jacoco</sonar.java.codeCoveragePlugin>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <build>
@@ -143,25 +146,12 @@
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
         </exclusion>
-        <!--
-          CVE-2021-29425
-          Improper Limitation Of A Pathname To A Restricted Directory ('Path Traversal')
-        -->
-        <exclusion>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>31.1-jre</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
