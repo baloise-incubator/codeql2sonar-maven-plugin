@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <organization>
@@ -9,7 +8,7 @@
 
   <groupId>com.baloise.open</groupId>
   <artifactId>codeql2sonar-maven-plugin</artifactId>
-  <version>0.1.6-SNAPSHOT</version>
+  <version>0.1.6</version>
   <packaging>maven-plugin</packaging>
 
   <name>Maven plugin converting SARIF files</name>
@@ -33,7 +32,7 @@
     <developerConnection>scm:git:https://github.com/baloise-incubator/codeql2sonar-maven-plugin.git
     </developerConnection>
     <url>https://github.com/baloise-incubator/codeql2sonar-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>v0.1.6</tag>
   </scm>
 
   <distributionManagement>
