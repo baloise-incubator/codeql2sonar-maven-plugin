@@ -15,7 +15,7 @@ RUN apt-get install -y --no-install-recommends \
     unzip
 
 #SETUP Maven
-ENV MAVEN_VERSION 3.8.7
+ENV MAVEN_VERSION 3.8.8
 ENV MAVEN_HOME /usr/lib/mvn
 ENV PATH $MAVEN_HOME/bin:$PATH
 
