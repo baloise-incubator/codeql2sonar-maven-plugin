@@ -48,7 +48,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
 
     - name: Archive codeQl result
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Code-QL result (sarif file)
         path: /home/runner/work/codeql2sonar-maven-plugin/results/*.sarif
@@ -62,7 +62,7 @@ jobs:
         mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java.sarif -Dcodeql2sonar.sarif.ignoreTests=true -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
 
     - name: Archive conversion result
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: conversion result (json file)
         path: /home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
