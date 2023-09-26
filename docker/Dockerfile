@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL Description="prepare a docker image for executing codeql analysis on a repo"
 
 RUN mkdir /workdir
@@ -6,16 +6,17 @@ RUN mkdir /workdir/project2scan
 WORKDIR /workdir
 
 RUN apt-get update && \
-    apt-get upgrade -y
-RUN apt-get install -y ca-certificates && update-ca-certificates
-RUN apt-get install -y --no-install-recommends \
+    apt-get upgrade -y && \
+    apt-get install -y ca-certificates && update-ca-certificates && \
+    apt-get install -y --no-install-recommends \
     git \
     less \
     wget \
-    unzip
+    unzip && \
+    apt-get clean
 
 #SETUP Maven
-ENV MAVEN_VERSION 3.8.8
+ENV MAVEN_VERSION 3.9.4
 ENV MAVEN_HOME /usr/lib/mvn
 ENV PATH $MAVEN_HOME/bin:$PATH
 
@@ -24,8 +25,8 @@ RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apac
   rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   mv apache-maven-$MAVEN_VERSION $MAVEN_HOME
 
-#SETUP codeql cli v2.14.3
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.14.3/codeql-linux64.zip && \
+#SETUP codeql cli v2.14.6
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.14.6/codeql-linux64.zip && \
   unzip codeql-linux64.zip && \
   rm codeql-linux64.zip
 
