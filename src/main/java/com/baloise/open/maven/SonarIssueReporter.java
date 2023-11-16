@@ -77,6 +77,7 @@ public class SonarIssueReporter extends AbstractMojo {
   public SonarIssueReporter() {
   }
 
+  @Override
   public void execute() throws MojoExecutionException {
     getLog().info("execute SonarIssueReporter");
     try {
@@ -183,8 +184,8 @@ public class SonarIssueReporter extends AbstractMojo {
   }
 
   private File validate(File sarifFile) throws MojoExecutionException {
-    try {
-      final JsonObject rootObject = JsonParser.parseReader(new FileReader(sarifInputFile)).getAsJsonObject();
+    try (final FileReader sarifInputFileReader = new FileReader(this.sarifInputFile)) {
+      final JsonObject rootObject = JsonParser.parseReader(sarifInputFileReader).getAsJsonObject();
       if (!rootObject.has("$schema")) {
         throw new MojoExecutionException(sarifFile
             , "$schema not found in root object."
