@@ -17,7 +17,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@main # don't get confused by @master - it is the version of the checkout action. You repo will be checked out with ${{ github.ref }}
+        uses: actions/checkout@main
+      - name: Set up JDK 17
+        uses: actions/setup-java@main
+        with:
+          distribution: 'temurin'
+          java-version: 17
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
