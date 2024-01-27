@@ -45,7 +45,7 @@ public class SonarIssueMapper implements ParserCallback {
   public void onFinding(Result result) {
     if (result != null) {
       codeQlResults.add(result);
-      mappedIssues.getResult().add(mapResult(result));
+      mappedIssues.add(mapResult(result));
     }
   }
 
@@ -217,7 +217,7 @@ public class SonarIssueMapper implements ParserCallback {
 
   public String getSummary() {
     return String.format("parsed %d Rules, %d Results from codeQL resulting in %d issues.",
-            codeQlRules.size(), codeQlResults.size(), mappedIssues.getResult().size());
+            codeQlRules.size(), codeQlResults.size(), mappedIssues.get().size());
   }
 
   public Issues getMappedIssues(String[] patternsToExclude) {

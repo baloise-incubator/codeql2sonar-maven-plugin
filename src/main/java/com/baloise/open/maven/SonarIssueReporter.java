@@ -104,7 +104,7 @@ public class SonarIssueReporter extends AbstractMojo {
   void correctPathes(SonarIssueMapper sonarIssueMapper) {
     final List<String> srcDirPom = getSourceDirectoryFromPom(getPluginContext());
 
-    sonarIssueMapper.getMappedIssues(null).getResult().forEach(issue -> {
+    sonarIssueMapper.getMappedIssues(null).get().forEach(issue -> {
       //process each mapped issue
       final String filePath = issue.getPrimaryLocation().getFilePath();
       srcDirPom.stream()
@@ -152,7 +152,7 @@ public class SonarIssueReporter extends AbstractMojo {
     getLog().debug("patterns to exclude: " + Arrays.toString(patternsToExclude));
 
     final Issues mappedIssues = sonarIssueMapper.getMappedIssues(patternsToExclude);
-    getLog().info(String.format("Writing target '%s' containing %d issues.", target, mappedIssues.getResult().size()));
+    getLog().info(String.format("Writing target '%s' containing %d issues.", target, mappedIssues.get().size()));
 
     new GsonBuilder().setPrettyPrinting().create().toJson(mappedIssues, writer);
     writer.flush();

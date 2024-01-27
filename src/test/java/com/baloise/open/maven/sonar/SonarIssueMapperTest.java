@@ -22,20 +22,20 @@ class SonarIssueMapperTest {
     final SonarIssueMapper testee = new SonarIssueMapper();
 
     assertEquals("parsed 0 Rules, 0 Results from codeQL resulting in 0 issues.", testee.getSummary());
-    assertEquals(0, testee.getMappedIssues(null).getResult().size());
-    assertEquals(0, testee.getMappedIssues(new String[0]).getResult().size());
+    assertEquals(0, testee.getMappedIssues(null).get().size());
+    assertEquals(0, testee.getMappedIssues(new String[0]).get().size());
 
     testee.onFinding(null);
     assertEquals("parsed 0 Rules, 0 Results from codeQL resulting in 0 issues.", testee.getSummary());
-    assertEquals(0, testee.getMappedIssues(null).getResult().size());
-    assertEquals(0, testee.getMappedIssues(new String[0]).getResult().size());
+    assertEquals(0, testee.getMappedIssues(null).get().size());
+    assertEquals(0, testee.getMappedIssues(new String[0]).get().size());
 
 
     testee.onFinding(createTestResult("testUri"));
 
     assertEquals("parsed 0 Rules, 1 Results from codeQL resulting in 1 issues.", testee.getSummary());
-    assertEquals(1, testee.getMappedIssues(null).getResult().size());
-    assertEquals(1, testee.getMappedIssues(new String[0]).getResult().size());
+    assertEquals(1, testee.getMappedIssues(null).get().size());
+    assertEquals(1, testee.getMappedIssues(new String[0]).get().size());
   }
 
   @Test
@@ -47,9 +47,9 @@ class SonarIssueMapperTest {
     testee.onFinding(createTestResult("testUri"));
 
     assertEquals("parsed 1 Rules, 1 Results from codeQL resulting in 1 issues.", testee.getSummary());
-    assertEquals(1, testee.getMappedIssues(null).getResult().size());
+    assertEquals(1, testee.getMappedIssues(null).get().size());
 
-    final Issue issue = testee.getMappedIssues(null).getResult().get(0);
+    final Issue issue = testee.getMappedIssues(null).get().get(0);
     assertEquals(TEST_RULE_ID, issue.getRuleId());
     assertEquals(Issue.Severity.BLOCKER, issue.getSeverity());
     assertNotNull(issue.getPrimaryLocation());
@@ -65,14 +65,14 @@ class SonarIssueMapperTest {
     testee.onFinding(createTestResult("src/test/java/MyTestClass.java"));
     testee.onFinding(createTestResult("src/main/java/mypackage/MyClass.java"));
 
-    assertEquals(2, testee.getMappedIssues(null).getResult().size());
+    assertEquals(2, testee.getMappedIssues(null).get().size());
     assertMatchingIssue(testee, new String[]{"/test/"}, "src/main/java/mypackage/MyClass.java");
     assertMatchingIssue(testee, new String[]{"/TEST/"}, "src/main/java/mypackage/MyClass.java");
     assertMatchingIssue(testee, new String[]{"mypackage"}, "src/test/java/MyTestClass.java");
     assertMatchingIssue(testee, new String[]{"mypackage"}, "src/test/java/MyTestClass.java");
 
     testee.onFinding(createTestResult("src/main/java/another/package/AnyTester.java"));
-    assertEquals(3, testee.getMappedIssues(null).getResult().size());
+    assertEquals(3, testee.getMappedIssues(null).get().size());
     assertMatchingIssue(testee, new String[]{"mypackage","another/package"}, "src/test/java/MyTestClass.java");
     assertMatchingIssue(testee, new String[]{"(test)"}, "src/main/java/mypackage/MyClass.java");
     assertMatchingIssue(testee, new String[]{"(my[\\S]*\\.java)"}, "src/main/java/another/package/AnyTester.java");
@@ -80,8 +80,8 @@ class SonarIssueMapperTest {
 
   private void assertMatchingIssue(SonarIssueMapper testee, String[] patternsToExclude, String expected1stPath) {
     final Issues mappedIssuesFiltered = testee.getMappedIssues(patternsToExclude);
-    assertEquals(1, mappedIssuesFiltered.getResult().size());
-    assertEquals(expected1stPath, mappedIssuesFiltered.getResult().get(0).getPrimaryLocation().getFilePath());
+    assertEquals(1, mappedIssuesFiltered.get().size());
+    assertEquals(expected1stPath, mappedIssuesFiltered.get().get(0).getPrimaryLocation().getFilePath());
   }
 
   @Test

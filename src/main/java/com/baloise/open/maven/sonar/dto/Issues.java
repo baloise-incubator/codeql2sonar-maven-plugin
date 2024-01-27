@@ -31,13 +31,19 @@ public final class Issues {
   @SerializedName(value = "issues")
   private final List<Issue> result = new ArrayList<>();
 
-  public List<Issue> getResult() {
-    return result;
+  public List<Issue> get() {
+    return new ArrayList<>(result);
+  }
+
+  public void add(Issue issue) {
+    if (!result.contains(issue)) {
+      result.add(issue);
+    }
   }
 
   public Issues applyFilter(Predicate<Issue> predicate) {
     final Issues filteredIssues = new Issues();
-    filteredIssues.getResult().addAll(this.getResult().stream().filter(predicate).collect(Collectors.toList()));
+    filteredIssues.result.addAll(this.result.stream().filter(predicate).collect(Collectors.toList()));
     return filteredIssues;
   }
 }
