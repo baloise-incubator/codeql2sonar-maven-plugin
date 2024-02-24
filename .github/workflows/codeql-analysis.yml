@@ -36,7 +36,7 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
     - name: Cache Maven packages
-      uses: actions/cache@v3
+      uses: actions/cache@main
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -44,17 +44,17 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@main
       with:
         languages: ${{ matrix.language }}
         queries: security-and-quality
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@main
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@main
 
     - name: Archive codeQl result
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@main
       with:
         name: Code-QL result (sarif file)
         path: /home/runner/work/codeql2sonar-maven-plugin/results/*.sarif
@@ -68,7 +68,7 @@ jobs:
         mvn -B codeql2sonar:SonarIssueReporter -Dcodeql2sonar.sarif.inputfile=/home/runner/work/codeql2sonar-maven-plugin/results/java.sarif -Dcodeql2sonar.sarif.ignoreTests=true -Dcodeql2sonar.sarif.outputfile=/home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
 
     - name: Archive conversion result
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@main
       with:
         name: conversion result (json file)
         path: /home/runner/work/codeql2sonar-maven-plugin/results/sonar-cql-issues.json
