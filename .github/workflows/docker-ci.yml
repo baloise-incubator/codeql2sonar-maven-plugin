@@ -7,6 +7,7 @@ on:
       - 'docker/*'
   schedule:
     - cron: '28 3 * * 0' #Sundays at 3:28 AM
+  workflow_dispatch:
 
 defaults:
   run:
