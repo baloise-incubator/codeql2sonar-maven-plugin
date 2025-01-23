@@ -16,7 +16,7 @@ RUN apt-get update && \
     apt-get clean
 
 #SETUP Maven
-ENV MAVEN_VERSION 3.9.6
+ENV MAVEN_VERSION 3.9.9
 ENV MAVEN_HOME /usr/lib/mvn
 ENV PATH $MAVEN_HOME/bin:$PATH
 
