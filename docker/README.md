@@ -9,7 +9,7 @@ JAVA runtime provided by CodeQL CLI is used
 Pull from [DockerHub](https://hub.docker.com/r/arburk/codeql-analyzer-java): 
 `docker pull arburk/codeql-analyzer-java`  
 or build image like following:
-`docker build . -t arburk/codeql-analyzer-java:2.20.1`
+`docker build . -t arburk/codeql-analyzer-java:2.20.2`
 
 The project to scan needs to be mounted into ___/workdir/project2scan/___ like following:
-`docker run -v c:/dev/repos/myJavaProject:/workdir/project2scan arburk/codeql-analyzer-java:2.20.1`
+`docker run -v c:/dev/repos/myJavaProject:/workdir/project2scan arburk/codeql-analyzer-java:2.20.2`
