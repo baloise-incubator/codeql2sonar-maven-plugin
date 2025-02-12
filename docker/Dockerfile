@@ -25,8 +25,8 @@ RUN wget https://downloads.apache.org/maven/maven-3/$MAVEN_VERSION/binaries/apac
   rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
   mv apache-maven-$MAVEN_VERSION $MAVEN_HOME
 
-#SETUP codeql cli v2.20.3
-RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.20.3/codeql-linux64.zip && \
+#SETUP codeql cli v2.20.4
+RUN wget https://github.com/github/codeql-cli-binaries/releases/download/v2.20.4/codeql-linux64.zip && \
   unzip codeql-linux64.zip && \
   rm codeql-linux64.zip
 
