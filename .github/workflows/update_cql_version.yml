@@ -1,0 +1,32 @@
+name: update codeql-cli-binaries version
+on: 
+  workflow_dispatch:
+    inputs:
+      old_version:
+        description: 'specify version to be replaced/searched for (e.g. v2.20.3)'
+        required: true
+        type: string
+      new_version:
+        description: 'specify new version to be set (e.g. v2.20.4)'
+        required: true
+        type: string
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Find and Replace
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: ${{ inputs.old_version }} 
+          replace: ${{ inputs.new_version }} 
+          include: "docker/**"
+          regex: false
+
+ #     - name: Push changes
+ #       uses: stefanzweifel/git-auto-commit-action@v4
