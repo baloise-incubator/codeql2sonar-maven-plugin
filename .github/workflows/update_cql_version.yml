@@ -30,3 +30,8 @@ jobs:
 
       - name: Push changes
         uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump cql from ${{ inputs.old_version }}  to ${{ inputs.new_version }} 
+          create_branch: true
+          branch: codeql-cli-${{ inputs.new_version }}
+          
