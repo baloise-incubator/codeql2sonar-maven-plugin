@@ -31,7 +31,16 @@ jobs:
       - name: Push changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Bump cql from ${{ inputs.old_version }}  to ${{ inputs.new_version }} 
+          commit_message: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
           create_branch: true
           branch: codeql-cli-${{ inputs.new_version }}
           
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: codeql-cli-${{ inputs.new_version }}
+          delete-branch: true
+          title: 'Update CodeQL to version ${{ inputs.new_version }}'
+          body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
+          labels: automated pr
