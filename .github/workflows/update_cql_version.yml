@@ -39,7 +39,8 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: codeql-cli-${{ inputs.new_version }}
+          branch: create-pull-request/codeql-cli-${{ inputs.new_version }}
+          base: main
           delete-branch: true
           title: 'Update CodeQL to version ${{ inputs.new_version }}'
           body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
