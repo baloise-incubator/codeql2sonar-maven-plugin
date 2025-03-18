@@ -11,6 +11,12 @@ on:
         required: true
         type: string
         
+## If using the repository's GITHUB_TOKEN and your repository was created after 2nd February 2023, the default permission is read-only. 
+## Elevate the permissions in this workflow.
+permissions: 
+  contents: write
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,9 +38,9 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: codeql-cli-${{ inputs.new_version }}
+          branch: 'codeql-cli-${{ inputs.new_version }}'
           base: main
-          commit_message: 'build: bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}'
+          commit-message: 'build: bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}'
           title: 'Update CodeQL to version ${{ inputs.new_version }}'
           body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
           labels: automated_pr
