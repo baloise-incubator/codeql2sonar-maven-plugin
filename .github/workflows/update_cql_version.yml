@@ -27,13 +27,6 @@ jobs:
           replace: ${{ inputs.new_version }} 
           include: "docker/**"
           regex: false
-
-      - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
-          create_branch: true
-          branch: codeql-cli-${{ inputs.new_version }}
           
       - name: Create Pull Request
         id: cpr
@@ -41,6 +34,7 @@ jobs:
         with:
           branch: codeql-cli-${{ inputs.new_version }}
           base: main
+          commit_message: 'build: bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}'
           title: 'Update CodeQL to version ${{ inputs.new_version }}'
           body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
-          labels: automated pr
+          labels: automated_pr
