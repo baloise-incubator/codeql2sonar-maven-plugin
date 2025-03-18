@@ -36,7 +36,7 @@ jobs:
           
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
         with:
           branch: 'codeql-cli-${{ inputs.new_version }}'
           base: main
@@ -44,3 +44,4 @@ jobs:
           title: 'Update CodeQL to version ${{ inputs.new_version }}'
           body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
           labels: automated_pr
+          maintainer-can-modify: false
