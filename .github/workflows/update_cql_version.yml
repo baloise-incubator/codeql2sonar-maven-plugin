@@ -44,5 +44,6 @@ jobs:
           commit-message: 'build: bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}'
           title: 'Update CodeQL to version ${{ inputs.new_version }}'
           body: Bump cql from ${{ inputs.old_version }} to ${{ inputs.new_version }}
+          reviewers: arburk
           labels: automated_pr
           maintainer-can-modify: false
