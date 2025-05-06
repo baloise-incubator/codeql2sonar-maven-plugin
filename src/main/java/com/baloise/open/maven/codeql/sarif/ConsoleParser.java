@@ -50,6 +50,6 @@ public class ConsoleParser implements ParserCallback {
 
   @Override
   public void onRule(Rule rule) {
-    logger.debug(String.format("Processed rule[%s]: %s", rule.getId(), rule.getName() ));
+    logger.debug("Processed rule[%s]: %s".formatted(rule.getId(), rule.getName()));
   }
 }

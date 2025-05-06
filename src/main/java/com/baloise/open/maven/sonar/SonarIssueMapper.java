@@ -216,7 +216,7 @@ public class SonarIssueMapper implements ParserCallback {
   }
 
   public String getSummary() {
-    return String.format("parsed %d Rules, %d Results from codeQL resulting in %d issues.",
+    return "parsed %d Rules, %d Results from codeQL resulting in %d issues.".formatted(
             codeQlRules.size(), codeQlResults.size(), mappedIssues.get().size());
   }
 

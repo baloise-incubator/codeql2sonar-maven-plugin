@@ -170,7 +170,7 @@ public class SarifParser {
         try {
           return levelAsString == null ? null : Rule.Level.valueOf(levelAsString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-          LOGGER.warning(String.format("Failed to interpret %s as Rule.Level: %s", levelAsString, e.getMessage()));
+          LOGGER.warning("Failed to interpret %s as Rule.Level: %s".formatted(levelAsString, e.getMessage()));
         }
       }
     }
@@ -207,7 +207,7 @@ public class SarifParser {
       try {
         return RuleProperties.Severity.valueOf(severityAsString);
       } catch (IllegalArgumentException e) {
-        LOGGER.warning(String.format("Failed to interpret %s as RuleProperties.Severity: %s", severityAsString, e.getMessage()));
+        LOGGER.warning("Failed to interpret %s as RuleProperties.Severity: %s".formatted(severityAsString, e.getMessage()));
       }
     }
     return null;
