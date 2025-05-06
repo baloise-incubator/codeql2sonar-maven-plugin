@@ -33,7 +33,7 @@ public class Result {
 
   @Override
   public String toString() {
-    String result = String.format("Found issue based on rule '%s': '%s'", ruleId, message);
+    String result = "Found issue based on rule '%s': '%s'".formatted(ruleId, message);
     if (locations != null && !locations.isEmpty()) {
       result += "\nin '" + locations.get(0).toString() + "'";
     }

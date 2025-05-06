@@ -114,7 +114,7 @@ public class SonarIssueReporter extends AbstractMojo {
           .ifPresent(path2Fix -> {
             // remove module name
             final String replacedPath = filePath.substring(filePath.indexOf("/" + path2Fix) + 1);
-            getLog().debug(String.format("Replace '%s' with '%s'", filePath, replacedPath));
+            getLog().debug("Replace '%s' with '%s'".formatted(filePath, replacedPath));
             issue.getPrimaryLocation().setFilePath(replacedPath);
           });
     });
@@ -152,7 +152,7 @@ public class SonarIssueReporter extends AbstractMojo {
     getLog().debug("patterns to exclude: " + Arrays.toString(patternsToExclude));
 
     final Issues mappedIssues = sonarIssueMapper.getMappedIssues(patternsToExclude);
-    getLog().info(String.format("Writing target '%s' containing %d issues.", target, mappedIssues.get().size()));
+    getLog().info("Writing target '%s' containing %d issues.".formatted(target, mappedIssues.get().size()));
 
     new GsonBuilder().setPrettyPrinting().create().toJson(mappedIssues, writer);
     writer.flush();
@@ -175,9 +175,9 @@ public class SonarIssueReporter extends AbstractMojo {
     final File result = new File(sarifInputFile);
 
     if (!result.isFile()) {
-      throw new MojoExecutionException(String.format("Specified path is not a valid file: '%s'. %s", sarifInputFile, ERR_FILE_SUFFIX));
+      throw new MojoExecutionException("Specified path is not a valid file: '%s'. %s".formatted(sarifInputFile, ERR_FILE_SUFFIX));
     } else if (!result.canRead()) {
-      throw new MojoExecutionException(String.format("Specified file is not readable: '%s'. %s", sarifInputFile, ERR_FILE_SUFFIX));
+      throw new MojoExecutionException("Specified file is not readable: '%s'. %s".formatted(sarifInputFile, ERR_FILE_SUFFIX));
     }
 
     return validate(result);
@@ -189,7 +189,7 @@ public class SonarIssueReporter extends AbstractMojo {
       if (!rootObject.has("$schema")) {
         throw new MojoExecutionException(sarifFile
             , "$schema not found in root object."
-            , String.format("$schema not found in root object - provided file %s does not seem to be a valid sarif file", sarifFile.getName()));
+            , "$schema not found in root object - provided file %s does not seem to be a valid sarif file".formatted(sarifFile.getName()));
       }
     } catch (Exception e) {
       throw new MojoExecutionException(e.getMessage(), e);

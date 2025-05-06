@@ -32,11 +32,10 @@ public class Rule {
 
   @Override
   public String toString() {
-    return String.format("Rule[%s]%s: '%s'; %s"
-            , id
-            , level != null ? "-" + level : ""
-            , name
-            , properties);
+    return "Rule[%s]%s: '%s'; %s".formatted(id
+    , level != null ? "-" + level : ""
+    , name
+    , properties);
   }
 
   public enum Level {

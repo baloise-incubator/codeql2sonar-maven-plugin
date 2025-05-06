@@ -31,8 +31,8 @@ public class Driver {
 
   @Override
   public String toString() {
-    return String.format("%s %s %s",
-            organization==null ? "n/a" : organization,
+    return "%s %s %s".formatted(
+            organization == null ? "n/a" : organization,
             name == null ? "n/a" : name,
             StringUtils.isBlank(semanticVersion) ? "" : "v" + semanticVersion).trim();
   }

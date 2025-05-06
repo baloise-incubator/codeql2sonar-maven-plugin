@@ -30,9 +30,8 @@ public class Region {
 
   @Override
   public String toString() {
-    return String.format("Line %d, Column %d%s"
-            ,startLine
-            ,startColumn
-            , endColumn > 0 ? ":"+endColumn : "");
+    return "Line %d, Column %d%s".formatted(startLine
+    , startColumn
+    , endColumn > 0 ? ":" + endColumn : "");
   }
 }
